@@ -472,13 +472,6 @@ function toggleShow(id, el) {
 
 function saveSelectedShows() {
   localStorage.setItem('nb_selected', JSON.stringify([...selectedShows]));
-  // Re-sort and re-render so selected items float to the top
-  allShows.sort((a, b) => {
-    const aOn = selectedShows.has(a.id), bOn = selectedShows.has(b.id);
-    if (aOn !== bOn) return aOn ? -1 : 1;
-    return a.name.localeCompare(b.name);
-  });
-  renderShows();
 }
 function updateCount() {
   document.getElementById('sel-count').textContent = selectedShows.size;
