@@ -817,6 +817,7 @@ let builtOnce = false;
 const SCOPES = [
   'user-read-private','user-read-email',
   'user-follow-read',
+  'user-library-read',
   'playlist-modify-public','playlist-modify-private'
 ].join(' ');
 
@@ -977,9 +978,21 @@ async function loadFollowedShows() {
     while (url) {
       const r = await spotifyFetch(url);
       const data = await r.json();
-      if (!data.items) break;
-      shows = shows.concat(data.items.map(i => i.show));
-      url = data.next;
+
+      // Surface any API error clearly
+      if (data.error) {
+        listEl.innerHTML = `<div style="color:#e08080;font-family:var(--mono);font-size:0.72rem;padding:10px 0;line-height:1.6;">
+          Spotify API error ${data.error.status}:<br><strong>${data.error.message}</strong><br><br>
+          This usually means the token expired or a required permission is missing.<br>
+          Try <a href="#" onclick="logout();return false;" style="color:#1DB954;">disconnecting and reconnecting</a>.
+        </div>`;
+        return;
+      }
+
+      // Some accounts return total:0 with an empty items array — that's valid
+      if (!Array.isArray(data.items)) break;
+      shows = shows.concat(data.items.map(i => i.show).filter(Boolean));
+      url = data.next || null;
     }
     allShows = shows;
 
@@ -990,6 +1003,14 @@ async function loadFollowedShows() {
         selectedShows.add(s.id);
       }
     });
+
+    if (shows.length === 0) {
+      listEl.innerHTML = `<div style="color:var(--muted);font-size:0.78rem;padding:12px 0;line-height:1.7;">
+        No followed podcasts found on this account.<br>
+        <span style="font-size:0.7rem;color:#555;">Make sure you're connected with the right Spotify account and that you follow podcasts in the Spotify app (not just saved episodes).</span>
+      </div>`;
+      return;
+    }
 
     renderShowList(shows);
     updateSelCount();
