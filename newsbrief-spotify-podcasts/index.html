@@ -56,7 +56,13 @@
   .user-avatar img { width:100%; height:100%; object-fit:cover; }
   .user-name { font-size:0.88rem; font-weight:500; color:var(--warm); }
   .user-meta { font-family:var(--mono); font-size:0.62rem; color:var(--muted); margin-top:2px; }
-  .sidebar-label { font-family:var(--mono); font-size:0.63rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid #1e1e1e; flex-shrink:0; }
+  .sidebar-label { font-family:var(--mono); font-size:0.63rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); margin-bottom:0; padding-bottom:0; border-bottom:none; flex-shrink:0; }
+  .podcast-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; padding-bottom:8px; border-bottom:1px solid #1e1e1e; flex-shrink:0; }
+  .podcast-header-btns { display:flex; gap:10px; }
+  .podcast-header-btns button { background:none; border:none; font-family:var(--mono); font-size:0.62rem; cursor:pointer; letter-spacing:0.05em; padding:0; }
+  .podcast-header-btns .btn-all  { color:var(--green); }
+  .podcast-header-btns .btn-none { color:var(--muted); }
+  .podcast-header-btns button:hover { opacity:0.7; }
   .show-list { margin-bottom:16px; flex:1; min-height:0; overflow-y:auto; }
 
   .show-item { display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid #161616; cursor:pointer; }
@@ -191,7 +197,14 @@
           <div class="user-meta" id="user-meta-el">Spotify</div>
         </div>
       </div>
-      <div class="sidebar-label">Your Podcasts</div>
+      <div class="podcast-header">
+        <div class="sidebar-label">Your Podcasts</div>
+        <div class="podcast-header-btns">
+          <button class="btn-all"  onclick="selectAll()">all</button>
+          <span style="color:#333;">·</span>
+          <button class="btn-none" onclick="clearAll()">none</button>
+        </div>
+      </div>
       <div class="show-list" id="show-list">
         <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
       </div>
@@ -463,6 +476,20 @@ function toggleShow(id, el) {
   const chk = el.querySelector('.check-box');
   if (selectedShows.has(id)) { selectedShows.delete(id); el.classList.remove('checked'); chk.innerHTML = ''; }
   else { selectedShows.add(id); el.classList.add('checked'); chk.innerHTML = chkSvg(); }
+  updateCount();
+  saveSelectedShows();
+}
+
+function selectAll() {
+  allShows.forEach(s => selectedShows.add(s.id));
+  renderShows();
+  updateCount();
+  saveSelectedShows();
+}
+
+function clearAll() {
+  selectedShows.clear();
+  renderShows();
   updateCount();
   saveSelectedShows();
 }
