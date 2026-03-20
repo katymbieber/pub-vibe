@@ -241,7 +241,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   const saved = localStorage.getItem('mb_client_id');
   if (saved) document.getElementById('client-id-input').value = saved;
 
-  currentPlaylistId = localStorage.getItem('mb_playlist_id') || null;
+  currentPlaylistId = localStorage.getItem('nb_playlist_id') || null;
 
   const params = new URLSearchParams(window.location.search);
   const code = params.get('code');
@@ -292,7 +292,8 @@ async function exchangeCode(code) {
 }
 
 function logout() {
-  ['mb_token','mb_token_expiry','mb_pkce_verifier','mb_client_id','mb_playlist_id'].forEach(k => localStorage.removeItem(k));
+  ['mb_token','mb_token_expiry','mb_pkce_verifier','mb_client_id','nb_playlist_id'].forEach(k => localStorage.removeItem(k));
+  currentPlaylistId = null;
   accessToken = null; userId = null; allShows = []; selectedShows = new Set();
   document.getElementById('landing').style.display = '';
   document.getElementById('app').classList.remove('visible');
@@ -423,17 +424,20 @@ async function buildBrief() {
     const showNames = [...new Set(eps.map(e => e.show_name))].join(', ');
     const description = `${date} · ${eps.length} episodes · ${showNames}`;
 
-    // Delete previous playlist if one exists from a prior build
+    // Step 1: silently delete previous playlist if it exists — never block on failure
     if (currentPlaylistId) {
       setStatus('loading', 'Removing previous playlist…');
       try {
-        await sf(`https://api.spotify.com/v1/playlists/${currentPlaylistId}/followers`, { method: 'DELETE' });
-      } catch(e) { console.warn('Could not delete old playlist:', e.message); }
+        const delResp = await sf(`https://api.spotify.com/v1/playlists/${currentPlaylistId}/followers`, { method: 'DELETE' });
+        console.log('Deleted old playlist', currentPlaylistId, 'status:', delResp.status);
+      } catch(e) {
+        console.warn('Could not delete old playlist (continuing anyway):', e.message);
+      }
       currentPlaylistId = null;
-      localStorage.removeItem('mb_playlist_id');
+      localStorage.removeItem('nb_playlist_id');
     }
 
-    // Create fresh playlist using /me/playlists
+    // Step 2: create new playlist
     setStatus('loading', 'Creating Spotify playlist…');
     const createResp = await sf(`https://api.spotify.com/v1/me/playlists`, {
       method:'POST',
@@ -443,7 +447,7 @@ async function buildBrief() {
     if (playlist.error) throw new Error(`Could not create playlist: ${playlist.error.message}`);
 
     currentPlaylistId = playlist.id;
-    localStorage.setItem('mb_playlist_id', currentPlaylistId);
+    localStorage.setItem('nb_playlist_id', currentPlaylistId);
     currentPlaylistUrl = playlist.external_urls?.spotify || `https://open.spotify.com/playlist/${playlist.id}`;
     const playlistUri = playlist.uri;
     const playlistId = playlist.id;
