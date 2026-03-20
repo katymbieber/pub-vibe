@@ -617,6 +617,9 @@ function fmtDur(ms) { const m=Math.floor(ms/60000); return m<60?`${m}m`:`${Math.
 function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 // ── Settings restore (called once after showApp loads shows) ────────────────
+// ── Auto-refresh state (declared here so all functions can reference them) ──
+let arTimer = null, arCountdownTimer = null, arNextAt = null;
+
 function restoreSettings() {
   const eps = localStorage.getItem('nb_eps');
   if (eps) document.getElementById('eps-per-show').value = eps;
@@ -647,8 +650,6 @@ function restoreSettings() {
 }
 
 // ── Auto-refresh ─────────────────────────────────────────────────────────────
-let arTimer = null, arCountdownTimer = null, arNextAt = null;
-
 function toggleAutoRefresh() {
   const btn = document.getElementById('ar-toggle');
   const on = btn.classList.toggle('on');
