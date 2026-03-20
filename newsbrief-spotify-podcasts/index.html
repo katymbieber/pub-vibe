@@ -345,27 +345,25 @@ async function loadShows() {
       shows = shows.concat(d.items.map(i => i.show).filter(Boolean));
       url = d.next || null;
     }
-    // Log all shows so we can see what fields audiobooks have
-    console.log('All shows from API:', shows.map(s => ({
-      name: s.name, type: s.type, media_type: s.media_type,
-      show_type: s.show_type, kind: s.kind, is_externally_hosted: s.is_externally_hosted
-    })));
-
-    // Filter out audiobooks — check every field that could distinguish them
-    const filtered = shows.filter(s => {
-      const type = (s.type || '').toLowerCase();
-      const mediaType = (s.media_type || '').toLowerCase();
-      const showType = (s.show_type || '').toLowerCase();
-      const kind = (s.kind || '').toLowerCase();
-      const name = (s.name || '').toLowerCase();
-      // Log anything that looks like it might be an audiobook
-      if (type !== 'show' || mediaType.includes('audio') && !mediaType.includes('podcast')) {
-        console.log('Possible audiobook:', s.name, {type, mediaType, showType, kind});
+    // Fetch saved audiobooks so we can exclude them from the shows list.
+    // Spotify's /me/shows returns both podcasts and audiobooks with identical fields,
+    // so the only reliable way to filter is to get the audiobook IDs separately.
+    const audiobookIds = new Set();
+    try {
+      let abUrl = 'https://api.spotify.com/v1/me/audiobooks?limit=50';
+      while (abUrl) {
+        const abResp = await sf(abUrl);
+        const abData = await abResp.json();
+        if (!Array.isArray(abData.items)) break;
+        abData.items.forEach(item => {
+          const id = item.audiobook?.id || item.id;
+          if (id) audiobookIds.add(id);
+        });
+        abUrl = abData.next || null;
       }
-      return type === 'show' && !mediaType.includes('audiobook') && !showType.includes('audiobook') && !kind.includes('audiobook');
-    });
+    } catch(e) { console.warn('Could not fetch audiobooks (continuing anyway):', e.message); }
 
-    console.log('After filter:', filtered.map(s => s.name));
+    const filtered = shows.filter(s => !audiobookIds.has(s.id));
     allShows = filtered;
     filtered.forEach(s => { if (CURATED.some(n => s.name.toLowerCase().includes(n))) selectedShows.add(s.id); });
     renderShows(); updateCount();
