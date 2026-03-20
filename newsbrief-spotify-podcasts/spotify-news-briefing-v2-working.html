@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Morning Brief · Spotify Playlist Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #1DB954;
+    --green-dim: #158a3e;
+    --black: #0a0a0a;
+    --ink: #111111;
+    --paper: #f5f0e8;
+    --paper2: #ede8dc;
+    --muted: #8a8070;
+    --warm-white: #faf8f3;
+    --red: #e05252;
+    --serif: 'Playfair Display', Georgia, serif;
+    --mono: 'DM Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--ink);
+    color: var(--paper);
+    font-family: var(--sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── MASTHEAD ── */
+  .masthead {
+    border-bottom: 1px solid #2a2a2a;
+    padding: 18px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--black);
+  }
+  .masthead-title {
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    color: var(--paper);
+  }
+  .masthead-title span { color: var(--green); }
+  .masthead-date {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .masthead-badge {
+    background: var(--green);
+    color: var(--black);
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 2px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 80px 40px 60px;
+    max-width: 860px;
+    margin: 0 auto;
+    text-align: center;
+    position: relative;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, transparent, var(--muted));
+  }
+  .hero-eyebrow {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-family: var(--serif);
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -2px;
+    color: var(--warm-white);
+    margin-bottom: 20px;
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--green);
+  }
+  .hero p {
+    font-size: 1rem;
+    color: var(--muted);
+    line-height: 1.7;
+    max-width: 500px;
+    margin: 0 auto 40px;
+    font-weight: 300;
+  }
+
+  /* ── CONFIG PANEL ── */
+  #config-panel {
+    background: #141414;
+    border: 1px solid #252525;
+    border-radius: 4px;
+    padding: 28px 32px;
+    margin: 0 40px 24px;
+    max-width: 820px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .config-label {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .config-input {
+    width: 100%;
+    background: #0d0d0d;
+    border: 1px solid #2a2a2a;
+    border-radius: 3px;
+    padding: 11px 14px;
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: var(--paper);
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 20px;
+  }
+  .config-input:focus { border-color: var(--green); }
+  .config-input::placeholder { color: #444; }
+  .config-note {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: #555;
+    line-height: 1.6;
+    margin-top: -14px;
+    margin-bottom: 20px;
+  }
+  .config-note a { color: var(--green); text-decoration: none; }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 13px 28px;
+    border-radius: 3px;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-primary {
+    background: var(--green);
+    color: var(--black);
+  }
+  .btn-primary:hover { background: #22d160; transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-outline {
+    background: transparent;
+    color: var(--paper);
+    border: 1px solid #333;
+  }
+  .btn-outline:hover { border-color: var(--green); color: var(--green); }
+  .btn-danger {
+    background: transparent;
+    color: var(--red);
+    border: 1px solid #3a1a1a;
+    font-size: 0.72rem;
+  }
+  .btn-danger:hover { background: #1a0808; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+
+  /* ── MAIN APP ── */
+  #app { display: none; }
+  #app.visible { display: block; }
+
+  .app-layout {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 0;
+    min-height: calc(100vh - 60px);
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    background: var(--black);
+    border-right: 1px solid #1e1e1e;
+    padding: 32px 24px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  .sidebar-section-title {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding-bottom: 12px;
+    border-bottom: 1px solid #1e1e1e;
+    margin-bottom: 16px;
+  }
+  .user-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #1a1a1a;
+  }
+  .user-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #2a2a2a;
+    object-fit: cover;
+    border: 2px solid var(--green);
+  }
+  .user-avatar-placeholder {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #1e1e1e;
+    border: 2px solid var(--green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    color: var(--green);
+  }
+  .user-name {
+    font-family: var(--sans);
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--warm-white);
+  }
+  .user-meta {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* Podcast checkboxes in sidebar */
+  .podcast-check-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid #161616;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .podcast-check-item:hover { opacity: 0.85; }
+  .podcast-check-item input[type="checkbox"] { display: none; }
+  .check-box {
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid #333;
+    border-radius: 2px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+  .podcast-check-item.checked .check-box {
+    background: var(--green);
+    border-color: var(--green);
+  }
+  .check-icon { display: none; }
+  .podcast-check-item.checked .check-icon { display: block; }
+  .podcast-img-small {
+    width: 38px;
+    height: 38px;
+    border-radius: 3px;
+    object-fit: cover;
+    background: #222;
+    flex-shrink: 0;
+  }
+  .podcast-img-placeholder {
+    width: 38px;
+    height: 38px;
+    border-radius: 3px;
+    background: #1e1e1e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+  .podcast-info-small { flex: 1; min-width: 0; }
+  .podcast-name-small {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--warm-white);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .podcast-publisher-small {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    color: var(--muted);
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .sidebar-actions {
+    margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .sidebar-actions .btn { width: 100%; justify-content: center; }
+
+  .selected-count {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 8px;
+  }
+  .selected-count span { color: var(--green); font-weight: 500; }
+
+  /* ── MAIN CONTENT ── */
+  .main-content {
+    padding: 40px;
+    background: var(--ink);
+  }
+
+  .content-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 36px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #1e1e1e;
+  }
+  .content-header-left h2 {
+    font-family: var(--serif);
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--warm-white);
+    letter-spacing: -0.5px;
+  }
+  .content-header-left p {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-top: 6px;
+    letter-spacing: 0.05em;
+  }
+  .content-header-actions { display: flex; gap: 12px; align-items: center; }
+
+  /* ── STATUS BAR ── */
+  #status-bar {
+    background: #0d0d0d;
+    border: 1px solid #1e1e1e;
+    border-radius: 3px;
+    padding: 14px 20px;
+    margin-bottom: 28px;
+    display: none;
+    align-items: center;
+    gap: 12px;
+  }
+  #status-bar.visible { display: flex; }
+  #status-bar.error { border-color: #3a1010; background: #0f0808; }
+  #status-bar.success { border-color: #0d3a1a; background: #060f0a; }
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--muted);
+    flex-shrink: 0;
+    animation: pulse 1.5s infinite;
+  }
+  #status-bar.error .status-dot { background: var(--red); animation: none; }
+  #status-bar.success .status-dot { background: var(--green); animation: none; }
+  #status-bar.loading .status-dot { background: var(--green); }
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+  #status-text {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+    flex: 1;
+  }
+  #status-bar.error #status-text { color: #e08080; }
+  #status-bar.success #status-text { color: #80e0a0; }
+
+  /* ── PLAYLIST CARD ── */
+  .playlist-card {
+    background: #111;
+    border: 1px solid #1e1e1e;
+    border-radius: 4px;
+    padding: 24px;
+    margin-bottom: 28px;
+    display: none;
+    animation: fadeUp 0.3s ease;
+  }
+  .playlist-card.visible { display: block; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+  .playlist-card-inner {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+  .playlist-art {
+    width: 80px;
+    height: 80px;
+    border-radius: 3px;
+    background: linear-gradient(135deg, #0d3a1a, #1DB954);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    flex-shrink: 0;
+  }
+  .playlist-meta { flex: 1; }
+  .playlist-badge {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 6px;
+  }
+  .playlist-name {
+    font-family: var(--serif);
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--warm-white);
+    margin-bottom: 4px;
+  }
+  .playlist-desc {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-bottom: 14px;
+    line-height: 1.5;
+  }
+  .playlist-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--green);
+    color: var(--black);
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 2px;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: background 0.2s;
+  }
+  .playlist-link:hover { background: #22d160; }
+
+  /* ── EPISODES TABLE ── */
+  .episodes-section-title {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #1a1a1a;
+  }
+  .episode-row {
+    display: grid;
+    grid-template-columns: 48px 1fr auto;
+    gap: 16px;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid #141414;
+    animation: fadeUp 0.25s ease both;
+  }
+  .episode-num {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: #333;
+    text-align: right;
+  }
+  .episode-info { min-width: 0; }
+  .episode-show {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    color: var(--green);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+  }
+  .episode-title {
+    font-size: 0.85rem;
+    color: var(--warm-white);
+    font-weight: 400;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .episode-date {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .episode-duration {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  /* ── EMPTY / LOADING STATE ── */
+  .empty-state {
+    text-align: center;
+    padding: 80px 40px;
+    color: var(--muted);
+  }
+  .empty-state .empty-icon { font-size: 3rem; margin-bottom: 16px; }
+  .empty-state h3 {
+    font-family: var(--serif);
+    font-size: 1.4rem;
+    color: #444;
+    margin-bottom: 10px;
+  }
+  .empty-state p { font-size: 0.82rem; line-height: 1.6; }
+
+  .loading-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 8px 0;
+  }
+  .skeleton-row {
+    height: 52px;
+    background: linear-gradient(90deg, #141414 25%, #1a1a1a 50%, #141414 75%);
+    background-size: 200% 100%;
+    border-radius: 3px;
+    animation: shimmer 1.5s infinite;
+  }
+  @keyframes shimmer { 0% { background-position:200% 0; } 100% { background-position:-200% 0; } }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid #1e1e1e;
+    margin-bottom: 28px;
+  }
+  .tab-btn {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-bottom: -1px;
+  }
+  .tab-btn.active { color: var(--green); border-bottom-color: var(--green); }
+  .tab-btn:hover:not(.active) { color: var(--warm-white); }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── SETTINGS ── */
+  .settings-grid { display: grid; gap: 20px; }
+  .setting-row {
+    background: #111;
+    border: 1px solid #1e1e1e;
+    border-radius: 3px;
+    padding: 18px 20px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .setting-info {}
+  .setting-name { font-size: 0.88rem; font-weight: 500; color: var(--warm-white); margin-bottom: 4px; }
+  .setting-desc { font-family: var(--mono); font-size: 0.65rem; color: var(--muted); line-height: 1.5; }
+  .toggle {
+    width: 40px;
+    height: 22px;
+    background: #2a2a2a;
+    border-radius: 11px;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+  .toggle::after {
+    content: '';
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 16px; height: 16px;
+    background: #555;
+    border-radius: 50%;
+    transition: all 0.2s;
+  }
+  .toggle.on { background: var(--green); }
+  .toggle.on::after { left: 21px; background: var(--black); }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #222; border-radius: 2px; }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .app-layout { grid-template-columns: 1fr; }
+    .sidebar { position: static; height: auto; }
+    .masthead { padding: 14px 20px; }
+    .hero { padding: 50px 20px 40px; }
+    .main-content { padding: 24px 20px; }
+    #config-panel { margin: 0 20px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- MASTHEAD -->
+<div class="masthead">
+  <div class="masthead-title">Morning<span>Brief</span></div>
+  <div class="masthead-date" id="today-date"></div>
+  <div class="masthead-badge">Spotify Playlist Builder</div>
+</div>
+
+<!-- LANDING / CONFIG -->
+<div id="landing">
+  <div class="hero">
+    <div class="hero-eyebrow">Daily News · Curated Automatically</div>
+    <h1>Your News,<br><em>Your Playlist.</em></h1>
+    <p>Connect your Spotify account to build a fresh daily news briefing playlist from the podcasts you already follow.</p>
+  </div>
+
+  <div id="config-panel">
+    <div class="config-label">Spotify Client ID</div>
+    <input class="config-input" type="text" id="client-id-input" placeholder="e.g. a1b2c3d4e5f6..." />
+    <div class="config-note">
+      <strong style="color:#ccc">Step 1:</strong> Go to <a href="https://developer.spotify.com/dashboard" target="_blank">developer.spotify.com/dashboard</a> → create a free app → copy the <strong style="color:#ccc">Client ID</strong> and paste it above.<br><br>
+      <strong style="color:#ccc">Step 2:</strong> Host this file so Spotify has a valid redirect URL. The easiest way: drag this HTML file onto <a href="https://app.netlify.com/drop" target="_blank">app.netlify.com/drop</a> — you get a free <code style="background:#1a1a1a;padding:1px 5px;border-radius:2px">https://</code> URL in seconds.<br><br>
+      <strong style="color:#ccc">Step 3:</strong> In your Spotify app → <em>Edit Settings</em> → <em>Redirect URIs</em> → add the Netlify URL exactly as shown, then open the app from that URL.<br><br>
+    </div>
+    <div style="margin-bottom:20px;">
+      <div class="config-label" style="margin-bottom:8px;">Your Redirect URI — copy this exactly into Spotify</div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <div id="redirect-hint" style="flex:1;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:3px;padding:10px 14px;font-family:var(--mono);font-size:0.78rem;color:#1DB954;word-break:break-all;"></div>
+        <button onclick="copyRedirect()" style="background:#1DB954;color:#0a0a0a;border:none;border-radius:3px;padding:10px 16px;font-family:var(--mono);font-size:0.72rem;font-weight:500;cursor:pointer;white-space:nowrap;" id="copy-btn">Copy</button>
+      </div>
+      <div style="font-family:var(--mono);font-size:0.65rem;color:#555;margin-top:8px;line-height:1.6;">
+        ⚠️ This must be added <strong style="color:#888">character-for-character</strong> in your Spotify app under <em>Edit Settings → Redirect URIs</em>. No trailing slash, no http vs https mismatch.
+      </div>
+    </div>
+
+    <div style="display:flex; gap:12px; flex-wrap:wrap;">
+      <button class="btn btn-primary" onclick="startAuth()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+        Connect with Spotify
+      </button>
+      <button class="btn btn-outline" onclick="loadDemo()">Preview Demo</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <div class="app-layout">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="user-card">
+        <div class="user-avatar-placeholder" id="user-avatar-el">?</div>
+        <div>
+          <div class="user-name" id="user-name-el">Loading…</div>
+          <div class="user-meta" id="user-meta-el">Spotify</div>
+        </div>
+      </div>
+
+      <div class="sidebar-section-title">Your Podcasts</div>
+      <div id="podcast-list">
+        <div class="loading-rows">
+          <div class="skeleton-row"></div>
+          <div class="skeleton-row"></div>
+          <div class="skeleton-row"></div>
+        </div>
+      </div>
+
+      <div id="debug-panel" style="display:none;margin-bottom:12px;">
+        <div style="background:#0d0d0d;border:1px solid #2a2a2a;border-radius:3px;padding:10px;font-family:var(--mono);font-size:0.62rem;color:#aaa;max-height:200px;overflow-y:auto;white-space:pre-wrap;word-break:break-all;" id="debug-output">...</div>
+      </div>
+
+      <div class="sidebar-actions">
+        <div class="selected-count"><span id="sel-count">0</span> podcasts selected</div>
+        <button class="btn btn-primary" id="build-btn" onclick="buildPlaylist()" disabled>
+          ▶ Build Playlist
+        </button>
+        <button class="btn btn-outline" id="refresh-btn" onclick="buildPlaylist()" disabled style="display:none">
+          ↺ Refresh Episodes
+        </button>
+        <button class="btn btn-danger" onclick="logout()">Disconnect</button>
+        <button class="btn btn-outline" style="font-size:0.65rem;padding:8px 12px;" onclick="runDiagnostic()">🔍 Diagnose API</button>
+      </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main-content">
+      <div class="content-header">
+        <div class="content-header-left">
+          <h2>Morning Brief</h2>
+          <p id="last-updated">No playlist built yet</p>
+        </div>
+      </div>
+
+      <div id="status-bar">
+        <div class="status-dot"></div>
+        <div id="status-text">Ready</div>
+      </div>
+
+      <div id="playlist-card" class="playlist-card">
+        <div class="playlist-card-inner">
+          <div class="playlist-art">🎙️</div>
+          <div class="playlist-meta">
+            <div class="playlist-badge">Active Playlist</div>
+            <div class="playlist-name" id="pl-name">Morning Brief</div>
+            <div class="playlist-desc" id="pl-desc">Your curated news briefing</div>
+            <a id="pl-link" href="#" target="_blank" class="playlist-link">
+              Open in Spotify
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('episodes', this)">Episodes</button>
+        <button class="tab-btn" onclick="switchTab('settings', this)">Settings</button>
+      </div>
+
+      <div id="tab-episodes" class="tab-panel active">
+        <div id="episodes-container">
+          <div class="empty-state">
+            <div class="empty-icon">🗞️</div>
+            <h3>No episodes yet</h3>
+            <p>Select podcasts from the sidebar<br>and click Build Playlist.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="tab-settings" class="tab-panel">
+        <div class="settings-grid">
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-name">Playlist Name</div>
+              <div class="setting-desc">Name of the Spotify playlist that will be created or updated</div>
+              <input class="config-input" id="playlist-name-setting" value="Morning Brief" style="margin-top:10px;margin-bottom:0">
+            </div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-name">Make Playlist Public</div>
+              <div class="setting-desc">Allow others to find and follow your briefing playlist</div>
+            </div>
+            <button class="toggle" id="public-toggle" onclick="this.classList.toggle('on')"></button>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-name">One Episode Per Show</div>
+              <div class="setting-desc">Only add the single latest episode from each selected podcast</div>
+            </div>
+            <button class="toggle on" id="one-ep-toggle" onclick="this.classList.toggle('on')"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── State ──────────────────────────────────────────────────────────────────
+let accessToken = null;
+let userId = null;
+let playlistId = null;
+let selectedShows = new Set();
+let allShows = [];
+let builtOnce = false;
+const SCOPES = [
+  'user-read-private','user-read-email',
+  'user-follow-read',
+  'user-library-read',
+  'playlist-modify-public','playlist-modify-private'
+].join(' ');
+
+// ── PKCE Helpers ───────────────────────────────────────────────────────────
+function generateRandomString(len) {
+  const arr = new Uint8Array(len);
+  crypto.getRandomValues(arr);
+  return btoa(String.fromCharCode(...arr)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+async function generateCodeChallenge(verifier) {
+  const data = new TextEncoder().encode(verifier);
+  const digest = await crypto.subtle.digest('SHA-256', data);
+  return btoa(String.fromCharCode(...new Uint8Array(digest))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+
+// ── Init ───────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', async () => {
+  // Compute canonical redirect URI — strip query, hash, and trailing slash
+  const redirectUri = window.location.href.split('?')[0].split('#')[0].replace(/\/+$/, '');
+  document.getElementById('redirect-hint').textContent = redirectUri;
+
+  window.copyRedirect = function() {
+    navigator.clipboard.writeText(redirectUri).then(() => {
+      const btn = document.getElementById('copy-btn');
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy', 2000);
+    });
+  };
+  document.getElementById('today-date').textContent =
+    new Date().toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'}).toUpperCase();
+
+  const saved = localStorage.getItem('mb_client_id');
+  if (saved) document.getElementById('client-id-input').value = saved;
+
+  // Handle PKCE callback (?code=...)
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+  if (code) {
+    window.history.replaceState({}, '', window.location.pathname);
+    await exchangeCode(code);
+    return;
+  }
+
+  const stored = localStorage.getItem('mb_token');
+  const expiry = localStorage.getItem('mb_token_expiry');
+  if (stored && expiry && Date.now() < parseInt(expiry)) {
+    accessToken = stored;
+    showApp();
+  }
+});
+
+// ── Auth ───────────────────────────────────────────────────────────────────
+async function startAuth() {
+  const cid = document.getElementById('client-id-input').value.trim();
+  if (!cid) { alert('Please enter your Spotify Client ID.'); return; }
+  localStorage.setItem('mb_client_id', cid);
+
+  const verifier = generateRandomString(64);
+  const challenge = await generateCodeChallenge(verifier);
+  localStorage.setItem('mb_pkce_verifier', verifier);
+
+  const redirect = (window.location.href.split('?')[0].split('#')[0]).replace(/\/+$/, '');
+  const url = new URL('https://accounts.spotify.com/authorize');
+  url.searchParams.set('response_type', 'code');
+  url.searchParams.set('client_id', cid);
+  url.searchParams.set('scope', SCOPES);
+  url.searchParams.set('redirect_uri', redirect);
+  url.searchParams.set('code_challenge_method', 'S256');
+  url.searchParams.set('code_challenge', challenge);
+  url.searchParams.set('show_dialog', 'true');
+  window.location.href = url.toString();
+}
+
+async function exchangeCode(code) {
+  const cid = localStorage.getItem('mb_client_id');
+  const verifier = localStorage.getItem('mb_pkce_verifier');
+  const redirect = (window.location.href.split('?')[0].split('#')[0]).replace(/\/+$/, '');
+  const r = await fetch('https://accounts.spotify.com/api/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      grant_type: 'authorization_code',
+      code, redirect_uri: redirect,
+      client_id: cid,
+      code_verifier: verifier
+    })
+  });
+  const data = await r.json();
+  if (data.access_token) {
+    accessToken = data.access_token;
+    localStorage.setItem('mb_token', accessToken);
+    localStorage.setItem('mb_token_expiry', Date.now() + data.expires_in * 1000);
+    if (data.refresh_token) localStorage.setItem('mb_refresh_token', data.refresh_token);
+    localStorage.removeItem('mb_pkce_verifier');
+    showApp();
+  } else {
+    alert('Spotify auth failed: ' + (data.error_description || JSON.stringify(data)));
+  }
+}
+
+function logout() {
+  ['mb_token','mb_token_expiry','mb_refresh_token','mb_pkce_verifier','mb_client_id'].forEach(k => localStorage.removeItem(k));
+  accessToken = null;
+  userId = null;
+  allShows = [];
+  selectedShows = new Set();
+  playlistId = null;
+  document.getElementById('landing').style.display = '';
+  document.getElementById('app').classList.remove('visible');
+}
+
+// ── Show App ───────────────────────────────────────────────────────────────
+async function showApp() {
+  document.getElementById('landing').style.display = 'none';
+  document.getElementById('app').classList.add('visible');
+  await loadProfile();
+  await loadFollowedShows();
+}
+
+async function spotifyFetch(url, opts = {}) {
+  const r = await fetch(url, {
+    ...opts,
+    headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json', ...(opts.headers||{}) }
+  });
+  if (r.status === 401) { logout(); throw new Error('Token expired'); }
+  return r;
+}
+
+async function spotifyFetchJSON(url, opts = {}) {
+  const r = await spotifyFetch(url, opts);
+  const data = await r.json();
+  if (data.error) throw new Error(`Spotify ${data.error.status}: ${data.error.message}`);
+  return data;
+}
+
+// ── Profile ────────────────────────────────────────────────────────────────
+let userMarket = 'US';
+async function loadProfile() {
+  try {
+    const r = await spotifyFetch('https://api.spotify.com/v1/me');
+    const data = await r.json();
+    userId = data.id;
+    userMarket = data.country || 'US';
+    document.getElementById('user-name-el').textContent = data.display_name || data.id;
+    document.getElementById('user-meta-el').textContent = `${data.followers?.total?.toLocaleString() || 0} followers`;
+    const av = document.getElementById('user-avatar-el');
+    if (data.images?.[0]?.url) {
+      av.outerHTML = `<img class="user-avatar" id="user-avatar-el" src="${data.images[0].url}" alt="">`;
+    } else {
+      av.textContent = (data.display_name || data.id)[0].toUpperCase();
+    }
+  } catch(e) { console.error(e); }
+}
+
+// ── Followed Shows ─────────────────────────────────────────────────────────
+// Default curated news shows (shown first / pre-checked)
+const CURATED_IDS = new Set([
+  '7GoM3kQkBGkXMnhBSJSHjl', // Up First - NPR
+  '0pWhyIKDMsT3TQQO3LVUSX', // Marketplace Morning Report
+  '3PECobTgAKMJCEFTgfBSwW', // Global News Podcast
+  '3N9UlbEJVAMtMnOjNJAOaT', // NPR News Now
+  '3T3ov7YMKXwfHPMDyFpn2P', // The Daily - NYT
+]);
+
+async function loadFollowedShows() {
+  const listEl = document.getElementById('podcast-list');
+  listEl.innerHTML = '<div class="loading-rows"><div class="skeleton-row"></div><div class="skeleton-row"></div><div class="skeleton-row"></div><div class="skeleton-row"></div></div>';
+
+  try {
+    let shows = [];
+    let url = 'https://api.spotify.com/v1/me/shows?limit=50';
+    while (url) {
+      const r = await spotifyFetch(url);
+      const data = await r.json();
+
+      // Surface any API error clearly
+      if (data.error) {
+        listEl.innerHTML = `<div style="color:#e08080;font-family:var(--mono);font-size:0.72rem;padding:10px 0;line-height:1.6;">
+          Spotify API error ${data.error.status}:<br><strong>${data.error.message}</strong><br><br>
+          This usually means the token expired or a required permission is missing.<br>
+          Try <a href="#" onclick="logout();return false;" style="color:#1DB954;">disconnecting and reconnecting</a>.
+        </div>`;
+        return;
+      }
+
+      // Some accounts return total:0 with an empty items array — that's valid
+      if (!Array.isArray(data.items)) break;
+      shows = shows.concat(data.items.map(i => i.show).filter(Boolean));
+      url = data.next || null;
+    }
+    allShows = shows;
+
+    // Pre-select curated shows (match by id or name)
+    const curatedNames = ['up first', 'marketplace morning report', 'global news podcast', 'npr news now', 'the daily'];
+    shows.forEach(s => {
+      if (CURATED_IDS.has(s.id) || curatedNames.some(n => s.name.toLowerCase().includes(n))) {
+        selectedShows.add(s.id);
+      }
+    });
+
+    if (shows.length === 0) {
+      listEl.innerHTML = `<div style="color:var(--muted);font-size:0.78rem;padding:12px 0;line-height:1.7;">
+        No followed podcasts found on this account.<br>
+        <span style="font-size:0.7rem;color:#555;">Make sure you're connected with the right Spotify account and that you follow podcasts in the Spotify app (not just saved episodes).</span>
+      </div>`;
+      return;
+    }
+
+    renderShowList(shows);
+    updateSelCount();
+  } catch(e) {
+    listEl.innerHTML = `<div style="color:#e08080;font-family:var(--mono);font-size:0.72rem;padding:10px 0">Failed to load shows.<br>${e.message}</div>`;
+  }
+}
+
+function renderShowList(shows) {
+  const listEl = document.getElementById('podcast-list');
+  if (!shows.length) {
+    listEl.innerHTML = '<div style="color:var(--muted);font-size:0.78rem;padding:12px 0">No podcasts followed yet.</div>';
+    return;
+  }
+  listEl.innerHTML = shows.map(s => {
+    const checked = selectedShows.has(s.id);
+    const img = s.images?.[0]?.url;
+    return `<label class="podcast-check-item ${checked?'checked':''}" onclick="toggleShow('${s.id}', this)">
+      <div class="check-box">
+        <svg class="check-icon" width="10" height="10" viewBox="0 0 12 12" fill="none">
+          <path d="M2 6l3 3 5-5" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      ${img ? `<img class="podcast-img-small" src="${img}" alt="">` : `<div class="podcast-img-placeholder">🎙️</div>`}
+      <div class="podcast-info-small">
+        <div class="podcast-name-small">${escHtml(s.name)}</div>
+        <div class="podcast-publisher-small">${escHtml(s.publisher||'')}</div>
+      </div>
+    </label>`;
+  }).join('');
+}
+
+function toggleShow(id, el) {
+  if (selectedShows.has(id)) { selectedShows.delete(id); el.classList.remove('checked'); }
+  else { selectedShows.add(id); el.classList.add('checked'); }
+  updateSelCount();
+}
+
+function updateSelCount() {
+  const n = selectedShows.size;
+  document.getElementById('sel-count').textContent = n;
+  document.getElementById('build-btn').disabled = n === 0;
+  document.getElementById('refresh-btn').disabled = n === 0;
+}
+
+// ── Build Playlist ─────────────────────────────────────────────────────────
+async function buildPlaylist() {
+  if (!selectedShows.size) return;
+  setStatus('loading', 'Fetching latest episodes…');
+  document.getElementById('build-btn').disabled = true;
+  document.getElementById('refresh-btn').disabled = true;
+  document.getElementById('episodes-container').innerHTML = '<div class="loading-rows">' + Array(5).fill('<div class="skeleton-row"></div>').join('') + '</div>';
+
+  try {
+    const onePerShow = document.getElementById('one-ep-toggle').classList.contains('on');
+    const episodes = await fetchLatestEpisodes([...selectedShows], onePerShow);
+
+    if (!episodes.length) {
+      setStatus('error', 'No episodes found for selected podcasts.');
+      document.getElementById('episodes-container').innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><h3>No episodes found</h3><p>Spotify may not have episodes available for these shows.</p></div>`;
+      return;
+    }
+
+    setStatus('loading', `Creating / updating playlist with ${episodes.length} episodes…`);
+    const plData = await upsertPlaylist(episodes);
+
+    renderPlaylistCard(plData);
+    renderEpisodes(episodes);
+    setStatus('success', `Playlist updated — ${episodes.length} episodes added.`);
+
+    document.getElementById('last-updated').textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
+    document.getElementById('refresh-btn').style.display = '';
+    document.getElementById('build-btn').style.display = 'none';
+    builtOnce = true;
+  } catch(e) {
+    setStatus('error', `Error: ${e.message}`);
+    console.error(e);
+  } finally {
+    updateSelCount();
+  }
+}
+
+async function fetchLatestEpisodes(showIds, onePerShow) {
+  const episodes = [];
+  for (const id of showIds) {
+    try {
+      const limit = onePerShow ? 1 : 3;
+      const data = await spotifyFetchJSON(
+        `https://api.spotify.com/v1/shows/${id}/episodes?limit=${limit}&market=${userMarket}`
+      );
+      const show = allShows.find(s => s.id === id);
+      (data.items || []).forEach(ep => {
+        if (ep && ep.uri) episodes.push({ ...ep, show_name: show?.name || 'Unknown Show' });
+      });
+    } catch(e) {
+      console.warn(`Failed to fetch episodes for show ${id}:`, e.message);
+      setStatus('loading', `Fetching episodes… (skipped one show: ${e.message})`);
+    }
+  }
+  episodes.sort((a,b) => new Date(b.release_date) - new Date(a.release_date));
+  return episodes;
+}
+
+async function upsertPlaylist(episodes) {
+  const plName = document.getElementById('playlist-name-setting').value.trim() || 'Morning Brief';
+  const isPublic = document.getElementById('public-toggle').classList.contains('on');
+
+  // Always create a fresh playlist owned by this token to avoid 403s from
+  // playlists created in a previous session that this token can't write to.
+  // If we already have a playlistId from this session, reuse it; otherwise create new.
+  if (!playlistId) {
+    const createResp = await spotifyFetch(`https://api.spotify.com/v1/users/${userId}/playlists`, {
+      method: 'POST',
+      body: JSON.stringify({
+        name: plName,
+        description: `MorningBrief · Auto-generated daily news briefing · ${new Date().toLocaleDateString()}`,
+        public: isPublic
+      })
+    });
+    const createData = await createResp.json();
+    if (createData.error) throw new Error(`Failed to create playlist: ${createData.error.message}`);
+    playlistId = createData.id;
+  } else {
+    // Update name/description of existing session playlist
+    const updateResp = await spotifyFetch(`https://api.spotify.com/v1/playlists/${playlistId}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        name: plName,
+        description: `MorningBrief · Auto-generated daily news briefing · ${new Date().toLocaleDateString()}`,
+        public: isPublic
+      })
+    });
+    const updateData = await updateResp.json();
+    // A 403 here means we don't own this playlist — clear it and recurse once
+    if (updateData.error && updateData.error.status === 403) {
+      playlistId = null;
+      return upsertPlaylist(episodes);
+    }
+  }
+
+  const uris = episodes.map(e => e.uri).filter(u => u && u.startsWith('spotify:episode:'));
+  if (uris.length === 0) throw new Error('No valid episode URIs found.');
+
+  // PUT replaces all existing items with the first batch
+  const putResp = await spotifyFetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
+    method: 'PUT',
+    body: JSON.stringify({ uris: uris.slice(0, 100) })
+  });
+  const putData = await putResp.json();
+  if (putData.error) throw new Error(`Failed to add episodes: ${putData.error.message} (playlist: ${playlistId})`);
+
+  for (let i = 100; i < uris.length; i += 100) {
+    const postResp = await spotifyFetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
+      method: 'POST',
+      body: JSON.stringify({ uris: uris.slice(i, i+100) })
+    });
+    const postData = await postResp.json();
+    if (postData.error) throw new Error(`Failed to add episodes (chunk ${i}): ${postData.error.message}`);
+  }
+
+  const r = await spotifyFetch(`https://api.spotify.com/v1/playlists/${playlistId}`);
+  return await r.json();
+}
+
+// ── Render Helpers ─────────────────────────────────────────────────────────
+function renderPlaylistCard(pl) {
+  document.getElementById('pl-name').textContent = pl.name || 'Morning Brief';
+  document.getElementById('pl-desc').textContent = `${pl.tracks?.total || 0} episodes · ${new Date().toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'})}`;
+
+  const spotifyUrl = pl.external_urls?.spotify;
+  const playlistUri = pl.uri; // e.g. spotify:playlist:xxx — opens desktop app directly
+
+  const linkEl = document.getElementById('pl-link');
+  if (spotifyUrl) {
+    linkEl.href = spotifyUrl;
+    linkEl.title = spotifyUrl;
+  } else if (playlistUri) {
+    // Fallback: construct the open.spotify.com URL from the URI
+    const id = playlistUri.split(':').pop();
+    linkEl.href = `https://open.spotify.com/playlist/${id}`;
+  }
+
+  // Also show a second "Open in App" button using the spotify: URI scheme
+  const existingAppBtn = document.getElementById('pl-app-link');
+  if (existingAppBtn) existingAppBtn.remove();
+  if (playlistUri) {
+    const appBtn = document.createElement('a');
+    appBtn.id = 'pl-app-link';
+    appBtn.href = playlistUri;
+    appBtn.className = 'playlist-link';
+    appBtn.style.cssText = 'background:#111;color:#1DB954;border:1px solid #1DB954;margin-left:8px;';
+    appBtn.textContent = 'Open in App';
+    linkEl.parentNode.insertBefore(appBtn, linkEl.nextSibling);
+  }
+
+  document.getElementById('playlist-card').classList.add('visible');
+  console.log('Playlist URL:', spotifyUrl, 'URI:', playlistUri);
+}
+
+function renderEpisodes(episodes) {
+  const el = document.getElementById('episodes-container');
+  if (!episodes.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><h3>No episodes</h3></div>';
+    return;
+  }
+  el.innerHTML = `<div class="episodes-section-title">${episodes.length} Episodes · Sorted by Date</div>` +
+    episodes.map((ep, i) => {
+      const dur = ep.duration_ms ? fmtDuration(ep.duration_ms) : '';
+      const date = ep.release_date ? new Date(ep.release_date).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '';
+      return `<div class="episode-row" style="animation-delay:${i*0.04}s">
+        <div class="episode-num">${String(i+1).padStart(2,'0')}</div>
+        <div class="episode-info">
+          <div class="episode-show">${escHtml(ep.show_name)}</div>
+          <div class="episode-title">${escHtml(ep.name)}</div>
+          <div class="episode-date">${date}</div>
+        </div>
+        <div class="episode-duration">${dur}</div>
+      </div>`;
+    }).join('');
+}
+
+function renderEpisodesDemo(episodes) {
+  renderEpisodes(episodes);
+}
+
+function fmtDuration(ms) {
+  const m = Math.floor(ms/60000);
+  if (m < 60) return `${m}m`;
+  return `${Math.floor(m/60)}h ${m%60}m`;
+}
+
+function setStatus(type, msg) {
+  const bar = document.getElementById('status-bar');
+  const txt = document.getElementById('status-text');
+  bar.className = `visible ${type}`;
+  txt.textContent = msg;
+  if (type === 'success') setTimeout(() => bar.classList.remove('visible'), 5000);
+}
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(`tab-${name}`).classList.add('active');
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── DEMO MODE ─────────────────────────────────────────────────────────────
+function loadDemo() {
+  document.getElementById('landing').style.display = 'none';
+  document.getElementById('app').classList.add('visible');
+  document.getElementById('user-name-el').textContent = 'Demo User';
+  document.getElementById('user-meta-el').textContent = 'Demo mode · Read-only';
+  document.getElementById('user-avatar-el').textContent = 'D';
+  userId = 'demo';
+
+  const demoShows = [
+    { id: 's1', name: 'Up First', publisher: 'NPR', images: [] },
+    { id: 's2', name: 'Marketplace Morning Report', publisher: 'American Public Media', images: [] },
+    { id: 's3', name: 'Global News Podcast', publisher: 'BBC World Service', images: [] },
+    { id: 's4', name: 'NPR News Now', publisher: 'NPR', images: [] },
+    { id: 's5', name: 'The Daily', publisher: 'The New York Times', images: [] },
+    { id: 's6', name: '1A', publisher: 'NPR', images: [] },
+    { id: 's7', name: 'Fresh Air', publisher: 'NPR', images: [] },
+  ];
+  allShows = demoShows;
+  ['s1','s2','s3','s4','s5'].forEach(id => selectedShows.add(id));
+  renderShowList(demoShows);
+  updateSelCount();
+
+  document.getElementById('build-btn').onclick = buildDemo;
+  document.getElementById('refresh-btn').onclick = buildDemo;
+}
+
+function buildDemo() {
+  setStatus('loading', 'Simulating episode fetch…');
+  document.getElementById('build-btn').disabled = true;
+  document.getElementById('episodes-container').innerHTML = '<div class="loading-rows">' + Array(5).fill('<div class="skeleton-row"></div>').join('') + '</div>';
+
+  setTimeout(() => {
+    const demos = [
+      { name: "The State of the Economy This Morning", show_name: "Marketplace Morning Report", release_date: "2026-03-19", duration_ms: 480000 },
+      { name: "Five Things You Need to Know Today", show_name: "Up First", release_date: "2026-03-19", duration_ms: 900000 },
+      { name: "What's Driving Markets Higher?", show_name: "The Daily", release_date: "2026-03-19", duration_ms: 2100000 },
+      { name: "World News Summary", show_name: "Global News Podcast", release_date: "2026-03-18", duration_ms: 1800000 },
+      { name: "Hourly News Summary", show_name: "NPR News Now", release_date: "2026-03-18", duration_ms: 300000 },
+    ].filter(e => {
+      const s = allShows.find(sh => sh.name === e.show_name);
+      return s && selectedShows.has(s.id);
+    });
+
+    document.getElementById('pl-name').textContent = document.getElementById('playlist-name-setting').value || 'Morning Brief';
+    document.getElementById('pl-desc').textContent = `${demos.length} episodes · Demo Mode`;
+    document.getElementById('pl-link').href = 'https://open.spotify.com';
+    document.getElementById('playlist-card').classList.add('visible');
+    renderEpisodes(demos);
+    setStatus('success', `Demo: ${demos.length} episodes would be added to your playlist.`);
+    document.getElementById('last-updated').textContent = `Last updated: ${new Date().toLocaleTimeString()} (demo)`;
+    document.getElementById('refresh-btn').style.display = '';
+    document.getElementById('build-btn').style.display = 'none';
+    updateSelCount();
+  }, 1800);
+}
+
+// ── Diagnostic ────────────────────────────────────────────────────────────
+async function runDiagnostic() {
+  const panel = document.getElementById('debug-panel');
+  const out = document.getElementById('debug-output');
+  panel.style.display = 'block';
+  out.textContent = 'Running…';
+
+  const lines = [];
+  try {
+    // 1. Check token exists
+    lines.push('Token: ' + (accessToken ? accessToken.substring(0,20) + '…' : 'MISSING'));
+
+    // 2. Check /me
+    const me = await spotifyFetch('https://api.spotify.com/v1/me');
+    const meData = await me.json();
+    lines.push('\n/me status: ' + me.status);
+    lines.push('User: ' + (meData.display_name || meData.id || 'unknown'));
+    lines.push('Product: ' + (meData.product || 'unknown'));
+    if (meData.error) lines.push('ERROR: ' + JSON.stringify(meData.error));
+
+    // 3. Raw /me/shows call with limit=1
+    const showsR = await spotifyFetch('https://api.spotify.com/v1/me/shows?limit=1');
+    const showsData = await showsR.json();
+    lines.push('\n/me/shows status: ' + showsR.status);
+    lines.push('Raw response: ' + JSON.stringify(showsData, null, 2).substring(0, 800));
+
+    // 4. Check scopes from token (decode JWT middle part)
+    try {
+      const parts = accessToken.split('.');
+      if (parts.length === 3) {
+        const payload = JSON.parse(atob(parts[1].replace(/-/g,'+').replace(/_/g,'/')));
+        lines.push('\nToken scopes: ' + (payload.scope || payload.scp || 'not in token payload'));
+      }
+    } catch(e) { lines.push('\n(Could not decode token scopes)'); }
+
+  } catch(e) {
+    lines.push('\nException: ' + e.message);
+  }
+
+  out.textContent = lines.join('\n');
+}
+</script>
+</body>
+</html>
