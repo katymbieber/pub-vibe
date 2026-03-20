@@ -22,7 +22,6 @@
   .masthead-date { font-family:var(--mono); font-size:0.65rem; color:var(--muted); letter-spacing:0.08em; text-transform:uppercase; }
   .masthead-badge { background:var(--green); color:var(--black); font-family:var(--mono); font-size:0.62rem; font-weight:500; padding:4px 10px; border-radius:2px; letter-spacing:0.06em; text-transform:uppercase; }
 
-  /* LANDING */
   .landing { max-width:680px; margin:0 auto; padding:60px 24px 40px; text-align:center; }
   .eyebrow { font-family:var(--mono); font-size:0.68rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--green); margin-bottom:18px; }
   h1 { font-family:var(--serif); font-size:clamp(2rem,5vw,3.6rem); font-weight:900; line-height:1.05; letter-spacing:-2px; color:var(--warm); margin-bottom:16px; }
@@ -38,7 +37,6 @@
   .redirect-box { background:#0d0d0d; border:1px solid #2a2a2a; border-radius:3px; padding:10px 14px; font-family:var(--mono); font-size:0.75rem; color:var(--green); word-break:break-all; }
   .redirect-note { font-family:var(--mono); font-size:0.63rem; color:#555; margin-top:6px; margin-bottom:20px; line-height:1.5; }
 
-  /* BUTTONS */
   .btn { display:inline-flex; align-items:center; gap:8px; padding:12px 24px; border-radius:3px; font-family:var(--mono); font-size:0.78rem; font-weight:500; letter-spacing:0.08em; text-transform:uppercase; border:none; cursor:pointer; transition:all .2s; }
   .btn-primary { background:var(--green); color:var(--black); width:100%; justify-content:center; }
   .btn-primary:hover:not(:disabled) { background:#22d160; }
@@ -48,12 +46,10 @@
   .copy-btn { background:var(--green); color:var(--black); border:none; border-radius:3px; padding:10px 16px; font-family:var(--mono); font-size:0.7rem; font-weight:500; cursor:pointer; white-space:nowrap; transition:background .2s; }
   .copy-btn:hover { background:#22d160; }
 
-  /* APP */
   #app { display:none; }
   #app.visible { display:block; }
   .app-layout { display:grid; grid-template-columns:300px 1fr; min-height:calc(100vh - 56px); }
 
-  /* SIDEBAR */
   .sidebar { background:var(--black); border-right:1px solid #1e1e1e; padding:24px 20px; display:flex; flex-direction:column; height:calc(100vh - 56px); position:sticky; top:0; overflow-y:auto; }
   .user-card { display:flex; align-items:center; gap:12px; margin-bottom:24px; padding-bottom:20px; border-bottom:1px solid #1a1a1a; }
   .user-avatar { width:40px; height:40px; border-radius:50%; background:#1e1e1e; border:2px solid var(--green); display:flex; align-items:center; justify-content:center; font-family:var(--serif); font-size:1rem; color:var(--green); flex-shrink:0; overflow:hidden; }
@@ -62,6 +58,7 @@
   .user-meta { font-family:var(--mono); font-size:0.62rem; color:var(--muted); margin-top:2px; }
   .sidebar-label { font-family:var(--mono); font-size:0.63rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid #1e1e1e; }
   .show-list { flex:1; overflow-y:auto; margin-bottom:16px; }
+
   .show-item { display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid #161616; cursor:pointer; }
   .show-item:hover { opacity:0.85; }
   .check-box { width:18px; height:18px; border:1.5px solid #333; border-radius:2px; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .15s; }
@@ -71,17 +68,16 @@
   .show-info { flex:1; min-width:0; }
   .show-name { font-size:0.76rem; font-weight:500; color:var(--warm); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .show-pub { font-family:var(--mono); font-size:0.6rem; color:var(--muted); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
   .sidebar-actions { display:flex; flex-direction:column; gap:8px; margin-top:4px; }
   .sel-count { font-family:var(--mono); font-size:0.65rem; color:var(--muted); text-align:center; }
   .sel-count span { color:var(--green); font-weight:500; }
 
-  /* MAIN */
   .main { padding:32px 36px; background:var(--ink); overflow-y:auto; }
   .main-header { margin-bottom:28px; padding-bottom:20px; border-bottom:1px solid #1e1e1e; }
   .main-title { font-family:var(--serif); font-size:1.9rem; font-weight:900; color:var(--warm); letter-spacing:-0.5px; }
   .main-sub { font-family:var(--mono); font-size:0.65rem; color:var(--muted); margin-top:6px; }
 
-  /* PLAYLIST CARD */
   .playlist-card { background:#111; border:1px solid #1e1e1e; border-radius:4px; padding:22px 24px; margin-bottom:28px; animation:fadeUp .3s ease; }
   .pl-inner { display:flex; gap:18px; align-items:flex-start; }
   .pl-art { width:72px; height:72px; border-radius:3px; background:linear-gradient(135deg,#0d3a1a,#1DB954); display:flex; align-items:center; justify-content:center; font-size:1.8rem; flex-shrink:0; }
@@ -97,21 +93,19 @@
   .pl-btn-grey { background:transparent; color:var(--muted); border:1px solid #2a2a2a; }
   .pl-btn-grey:hover { border-color:var(--green); color:var(--green); }
 
-  /* STATUS */
   .status-bar { border-radius:3px; padding:12px 18px; margin-bottom:24px; display:flex; align-items:center; gap:12px; }
   .status-bar.loading { background:#0d0d0d; border:1px solid #1e1e1e; }
-  .status-bar.error { background:#0f0808; border:1px solid #3a1010; }
+  .status-bar.error   { background:#0f0808; border:1px solid #3a1010; }
   .status-bar.success { background:#060f0a; border:1px solid #0d3a1a; }
   .status-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
   .status-bar.loading .status-dot { background:var(--green); animation:pulse 1.5s infinite; }
-  .status-bar.error .status-dot { background:var(--red); }
+  .status-bar.error   .status-dot { background:var(--red); }
   .status-bar.success .status-dot { background:var(--green); }
   .status-text { font-family:var(--mono); font-size:0.73rem; }
   .status-bar.loading .status-text { color:var(--muted); }
-  .status-bar.error .status-text { color:#e08080; }
+  .status-bar.error   .status-text { color:#e08080; }
   .status-bar.success .status-text { color:#80e0a0; }
 
-  /* EPISODES */
   .episodes-header { font-family:var(--mono); font-size:0.63rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid #1a1a1a; }
   .episode-row { display:grid; grid-template-columns:36px 1fr auto; gap:14px; align-items:center; padding:14px 0; border-bottom:1px solid #141414; animation:fadeUp .25s ease both; }
   .episode-num { font-family:var(--mono); font-size:0.68rem; color:#333; text-align:right; }
@@ -123,34 +117,17 @@
   .ep-play-btn { display:inline-flex; align-items:center; gap:5px; background:var(--green); color:var(--black); text-decoration:none; padding:6px 12px; border-radius:2px; font-family:var(--mono); font-size:0.65rem; font-weight:500; letter-spacing:0.06em; text-transform:uppercase; white-space:nowrap; transition:background .15s; }
   .ep-play-btn:hover { background:#22d160; }
 
-  /* EMPTY / SKELETON */
   .empty-state { text-align:center; padding:60px 20px; color:var(--muted); }
   .empty-icon { font-size:2.5rem; margin-bottom:14px; }
   .empty-state h3 { font-family:var(--serif); font-size:1.3rem; color:#444; margin-bottom:8px; }
   .empty-state p { font-size:0.82rem; line-height:1.6; }
   .skeleton { background:linear-gradient(90deg,#141414 25%,#1a1a1a 50%,#141414 75%); background-size:200% 100%; animation:shimmer 1.5s infinite; border-radius:3px; height:60px; margin-bottom:10px; }
 
-  /* SETTINGS PANEL */
-  .settings-panel { background:#0d0d0d; border:1px solid #1e1e1e; border-radius:3px; padding:16px; margin-bottom:12px; }
-  .settings-title { font-family:var(--mono); font-size:0.62rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--muted); margin-bottom:12px; }
-  .setting-row { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
-  .setting-row:last-child { margin-bottom:0; }
-  .setting-label { font-family:var(--mono); font-size:0.68rem; color:var(--paper); }
-  .setting-sub { font-family:var(--mono); font-size:0.58rem; color:var(--muted); margin-top:2px; }
-  .setting-control { flex-shrink:0; }
-  select.setting-select { background:#1a1a1a; border:1px solid #2a2a2a; border-radius:3px; padding:5px 8px; font-family:var(--mono); font-size:0.68rem; color:var(--paper); outline:none; cursor:pointer; }
-  select.setting-select:focus { border-color:var(--green); }
-  .toggle-btn { width:36px; height:20px; background:#2a2a2a; border-radius:10px; border:none; cursor:pointer; position:relative; transition:background .2s; flex-shrink:0; }
-  .toggle-btn::after { content:''; position:absolute; top:2px; left:2px; width:16px; height:16px; background:#555; border-radius:50%; transition:all .2s; }
-  .toggle-btn.on { background:var(--green); }
-  .toggle-btn.on::after { left:18px; background:var(--black); }
-  .next-refresh { font-family:var(--mono); font-size:0.62rem; color:var(--green); text-align:center; margin-top:6px; }
-
   @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
   @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
   ::-webkit-scrollbar{width:4px;} ::-webkit-scrollbar-thumb{background:#222;border-radius:2px;}
-  @media(max-width:700px){.app-layout{grid-template-columns:1fr;}.sidebar{height:auto;position:static;}.main{padding:20px 16px;}.pl-actions{flex-direction:column;}}
+  @media(max-width:700px){.app-layout{grid-template-columns:1fr;}.sidebar{height:auto;position:static;}.main{padding:20px 16px;}}
 </style>
 </head>
 <body>
@@ -166,7 +143,7 @@
   <div class="landing">
     <div class="eyebrow">Daily News · Curated Automatically</div>
     <h1>Your News,<br><em>Your Way.</em></h1>
-    <p class="subtitle">Connect Spotify to pull the latest episodes from podcasts you follow, build a shareable playlist page, and open each episode directly in Spotify.</p>
+    <p class="subtitle">Connect Spotify to pull the latest episodes from podcasts you follow, build a shareable playlist, and open each episode directly in Spotify.</p>
     <div class="config-box">
       <label class="config-label">Spotify Client ID</label>
       <input class="config-input" type="text" id="client-id-input" placeholder="Paste your Client ID here…" />
@@ -203,50 +180,9 @@
       <div class="show-list" id="show-list">
         <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
       </div>
-      <div class="settings-panel">
-        <div class="settings-title">Settings</div>
-        <div class="setting-row">
-          <div>
-            <div class="setting-label">Episodes per show</div>
-          </div>
-          <div class="setting-control">
-            <select class="setting-select" id="eps-per-show">
-              <option value="1" selected>1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="5">5</option>
-            </select>
-          </div>
-        </div>
-        <div class="setting-row">
-          <div>
-            <div class="setting-label">Auto-refresh</div>
-            <div class="setting-sub">Rebuild playlist automatically</div>
-          </div>
-          <div class="setting-control">
-            <button class="toggle-btn" id="autorefresh-toggle" onclick="toggleAutoRefresh()"></button>
-          </div>
-        </div>
-        <div class="setting-row" id="interval-row" style="display:none;">
-          <div>
-            <div class="setting-label">Interval</div>
-          </div>
-          <div class="setting-control">
-            <select class="setting-select" id="refresh-interval">
-              <option value="3600000">Every hour</option>
-              <option value="10800000">Every 3 hours</option>
-              <option value="21600000" selected>Every 6 hours</option>
-              <option value="43200000">Every 12 hours</option>
-              <option value="86400000">Every 24 hours</option>
-            </select>
-          </div>
-        </div>
-        <div class="next-refresh" id="next-refresh-label" style="display:none;"></div>
-      </div>
-
       <div class="sidebar-actions">
         <div class="sel-count"><span id="sel-count">0</span> selected</div>
-        <button class="btn btn-primary" id="fetch-btn" onclick="buildBrief()" disabled>▶ Build News Brief</button>
+        <button class="btn btn-primary" id="build-btn" onclick="buildBrief()" disabled>▶ Build News Brief</button>
         <button class="btn btn-danger" onclick="logout()">Disconnect</button>
       </div>
     </div>
@@ -270,14 +206,20 @@
 </div>
 
 <script>
-let accessToken = null, userId = null, userMarket = 'US';
+'use strict';
+
+let accessToken = null, userId = null;
 let allShows = [], selectedShows = new Set();
 let currentEpisodes = [], currentPlaylistUrl = null, currentPlaylistId = null;
 
-const SCOPES = ['user-read-private','user-read-email','user-follow-read','user-library-read',
-                'playlist-modify-public','playlist-modify-private'].join(' ');
+const SCOPES = [
+  'user-read-private','user-read-email',
+  'user-follow-read','user-library-read',
+  'playlist-modify-public','playlist-modify-private'
+].join(' ');
 
-// ── PKCE ──────────────────────────────────────────────────────────────────
+const CURATED = ['up first','marketplace morning report','global news podcast','npr news now','the daily'];
+
 function randStr(n) {
   const a = new Uint8Array(n); crypto.getRandomValues(a);
   return btoa(String.fromCharCode(...a)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
@@ -290,26 +232,26 @@ function getRedirectUri() {
   return window.location.href.split('?')[0].split('#')[0].replace(/\/+$/,'');
 }
 
-// ── Init ──────────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('today-date').textContent =
     new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'}).toUpperCase();
   document.getElementById('redirect-hint').textContent = getRedirectUri();
-  const saved = localStorage.getItem('mb_client_id');
+  const saved = localStorage.getItem('nb_client_id');
   if (saved) document.getElementById('client-id-input').value = saved;
-
-  currentPlaylistId = localStorage.getItem('nb_playlist_id') || null;
-
-  // Restore episodes-per-show setting
-  const savedEps = localStorage.getItem('nb_eps_per_show');
-  if (savedEps) { const el = document.getElementById('eps-per-show'); if (el) el.value = savedEps; }
 
   const params = new URLSearchParams(window.location.search);
   const code = params.get('code');
-  if (code) { window.history.replaceState({}, '', window.location.pathname); await exchangeCode(code); return; }
-
-  const tk = localStorage.getItem('mb_token'), exp = localStorage.getItem('mb_token_expiry');
-  if (tk && exp && Date.now() < parseInt(exp)) { accessToken = tk; showApp(); }
+  if (code) {
+    window.history.replaceState({}, '', window.location.pathname);
+    await exchangeCode(code);
+    return;
+  }
+  const tk = localStorage.getItem('nb_token'), exp = localStorage.getItem('nb_token_expiry');
+  if (tk && exp && Date.now() < parseInt(exp)) {
+    accessToken = tk;
+    currentPlaylistId = localStorage.getItem('nb_playlist_id') || null;
+    showApp();
+  }
 });
 
 window.copyRedirect = function() {
@@ -319,48 +261,47 @@ window.copyRedirect = function() {
   });
 };
 
-// ── Auth ──────────────────────────────────────────────────────────────────
 async function startAuth() {
   const cid = document.getElementById('client-id-input').value.trim();
   if (!cid) { alert('Please enter your Spotify Client ID.'); return; }
-  localStorage.setItem('mb_client_id', cid);
+  localStorage.setItem('nb_client_id', cid);
   const verifier = randStr(64), challenge = await pkceChallenge(verifier);
-  localStorage.setItem('mb_pkce_verifier', verifier);
+  localStorage.setItem('nb_pkce_verifier', verifier);
   const url = new URL('https://accounts.spotify.com/authorize');
-  url.searchParams.set('response_type','code'); url.searchParams.set('client_id', cid);
-  url.searchParams.set('scope', SCOPES); url.searchParams.set('redirect_uri', getRedirectUri());
-  url.searchParams.set('code_challenge_method','S256'); url.searchParams.set('code_challenge', challenge);
+  url.searchParams.set('response_type','code'); url.searchParams.set('client_id',cid);
+  url.searchParams.set('scope',SCOPES); url.searchParams.set('redirect_uri',getRedirectUri());
+  url.searchParams.set('code_challenge_method','S256'); url.searchParams.set('code_challenge',challenge);
   url.searchParams.set('show_dialog','true');
   window.location.href = url.toString();
 }
 
 async function exchangeCode(code) {
-  const cid = localStorage.getItem('mb_client_id'), verifier = localStorage.getItem('mb_pkce_verifier');
+  const cid = localStorage.getItem('nb_client_id'), verifier = localStorage.getItem('nb_pkce_verifier');
   try {
     const r = await fetch('https://accounts.spotify.com/api/token', {
       method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'},
-      body: new URLSearchParams({grant_type:'authorization_code', code, redirect_uri:getRedirectUri(), client_id:cid, code_verifier:verifier})
+      body: new URLSearchParams({grant_type:'authorization_code',code,redirect_uri:getRedirectUri(),client_id:cid,code_verifier:verifier})
     });
     const d = await r.json();
     if (d.access_token) {
       accessToken = d.access_token;
-      localStorage.setItem('mb_token', accessToken);
-      localStorage.setItem('mb_token_expiry', Date.now() + d.expires_in * 1000);
-      localStorage.removeItem('mb_pkce_verifier');
+      localStorage.setItem('nb_token', accessToken);
+      localStorage.setItem('nb_token_expiry', Date.now() + d.expires_in * 1000);
+      localStorage.removeItem('nb_pkce_verifier');
+      currentPlaylistId = localStorage.getItem('nb_playlist_id') || null;
       showApp();
     } else { alert('Auth failed: ' + (d.error_description || JSON.stringify(d))); }
   } catch(e) { alert('Auth error: ' + e.message); }
 }
 
 function logout() {
-  ['mb_token','mb_token_expiry','mb_pkce_verifier','mb_client_id','nb_playlist_id'].forEach(k => localStorage.removeItem(k));
-  currentPlaylistId = null;
+  ['nb_token','nb_token_expiry','nb_pkce_verifier','nb_client_id','nb_playlist_id'].forEach(k => localStorage.removeItem(k));
   accessToken = null; userId = null; allShows = []; selectedShows = new Set();
+  currentEpisodes = []; currentPlaylistUrl = null; currentPlaylistId = null;
   document.getElementById('landing').style.display = '';
   document.getElementById('app').classList.remove('visible');
 }
 
-// ── API ───────────────────────────────────────────────────────────────────
 async function sf(url, opts={}) {
   const r = await fetch(url, {...opts, headers:{'Authorization':`Bearer ${accessToken}`,'Content-Type':'application/json',...(opts.headers||{})}});
   if (r.status === 401) { logout(); throw new Error('Token expired — please reconnect.'); }
@@ -368,33 +309,30 @@ async function sf(url, opts={}) {
 }
 async function sfJSON(url, opts={}) {
   const r = await sf(url, opts);
+  if (r.status === 204) return {};
   const d = await r.json();
   if (d.error) throw new Error(`Spotify ${d.error.status}: ${d.error.message}`);
   return d;
 }
 
-// ── App ───────────────────────────────────────────────────────────────────
 async function showApp() {
   document.getElementById('landing').style.display = 'none';
   document.getElementById('app').classList.add('visible');
   await loadProfile();
   await loadShows();
-  restoreAutoRefreshState();
 }
 
 async function loadProfile() {
   try {
     const d = await sfJSON('https://api.spotify.com/v1/me');
-    userId = d.id; userMarket = d.country || 'US';
+    userId = d.id;
     document.getElementById('user-name-el').textContent = d.display_name || d.id;
-    document.getElementById('user-meta-el').textContent = `${(d.followers?.total||0).toLocaleString()} followers`;
+    document.getElementById('user-meta-el').textContent = 'Spotify';
     const av = document.getElementById('user-avatar-el');
     if (d.images?.[0]?.url) av.innerHTML = `<img src="${d.images[0].url}" alt="">`;
     else av.textContent = (d.display_name || d.id)[0].toUpperCase();
   } catch(e) { console.error(e); }
 }
-
-const CURATED = ['up first','marketplace morning report','global news podcast','npr news now','the daily'];
 
 async function loadShows() {
   const listEl = document.getElementById('show-list');
@@ -407,28 +345,25 @@ async function loadShows() {
       shows = shows.concat(d.items.map(i => i.show).filter(Boolean));
       url = d.next || null;
     }
-    // Fetch saved audiobooks so we can exclude them from the shows list.
-    // Spotify's /me/shows returns both podcasts and audiobooks with identical fields,
-    // so the only reliable way to filter is to get the audiobook IDs separately.
+
+    // Cross-reference audiobooks to exclude them — /me/shows returns both with identical fields
     const audiobookIds = new Set();
     try {
       let abUrl = 'https://api.spotify.com/v1/me/audiobooks?limit=50';
       while (abUrl) {
         const abResp = await sf(abUrl);
+        if (!abResp.ok) break;
         const abData = await abResp.json();
         if (!Array.isArray(abData.items)) break;
-        abData.items.forEach(item => {
-          const id = item.audiobook?.id || item.id;
-          if (id) audiobookIds.add(id);
-        });
+        abData.items.forEach(item => { const id = item.audiobook?.id || item.id; if (id) audiobookIds.add(id); });
         abUrl = abData.next || null;
       }
-    } catch(e) { console.warn('Could not fetch audiobooks (continuing anyway):', e.message); }
+    } catch(e) { console.warn('Could not fetch audiobooks:', e.message); }
 
-    const filtered = shows.filter(s => !audiobookIds.has(s.id));
-    allShows = filtered;
-    filtered.forEach(s => { if (CURATED.some(n => s.name.toLowerCase().includes(n))) selectedShows.add(s.id); });
-    renderShows(); updateCount();
+    allShows = shows.filter(s => !audiobookIds.has(s.id));
+    allShows.forEach(s => { if (CURATED.some(n => s.name.toLowerCase().includes(n))) selectedShows.add(s.id); });
+    renderShows();
+    updateCount();
   } catch(e) {
     listEl.innerHTML = `<div style="color:#e08080;font-family:var(--mono);font-size:0.72rem;line-height:1.7;padding:8px 0">Error: ${e.message}<br><a href="#" onclick="logout();return false;" style="color:var(--green)">Disconnect and reconnect</a></div>`;
   }
@@ -453,38 +388,33 @@ function renderShows() {
   }).join('');
 }
 
-function chkSvg() {
-  return `<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-}
-
 function toggleShow(id, el) {
   const chk = el.querySelector('.check-box');
   if (selectedShows.has(id)) { selectedShows.delete(id); el.classList.remove('checked'); chk.innerHTML = ''; }
   else { selectedShows.add(id); el.classList.add('checked'); chk.innerHTML = chkSvg(); }
   updateCount();
 }
-
 function updateCount() {
   document.getElementById('sel-count').textContent = selectedShows.size;
-  document.getElementById('fetch-btn').disabled = selectedShows.size === 0;
+  document.getElementById('build-btn').disabled = selectedShows.size === 0;
+}
+function chkSvg() {
+  return `<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#0a0a0a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 }
 
-// ── Build Brief ───────────────────────────────────────────────────────────
 async function buildBrief() {
   if (!selectedShows.size) return;
-  const btn = document.getElementById('fetch-btn');
+  const btn = document.getElementById('build-btn');
   btn.disabled = true;
   setStatus('loading', 'Fetching latest episodes…');
   document.getElementById('episodes-area').innerHTML = [1,2,3,4,5].map(()=>'<div class="skeleton"></div>').join('');
   document.getElementById('playlist-card-area').innerHTML = '';
 
   try {
-    // 1. Fetch latest episode per show
     const eps = [];
     for (const id of [...selectedShows]) {
       try {
-        const epsPerShow = parseInt(document.getElementById('eps-per-show').value) || 1;
-        const d = await sfJSON(`https://api.spotify.com/v1/shows/${id}/episodes?limit=${epsPerShow}&market=${userMarket}`);
+        const d = await sfJSON(`https://api.spotify.com/v1/shows/${id}/episodes?limit=1`);
         const show = allShows.find(s => s.id === id);
         (d.items||[]).forEach(ep => { if (ep?.uri) eps.push({...ep, show_name: show?.name||'Unknown'}); });
       } catch(e) { console.warn('Skipped show', id, e.message); }
@@ -492,73 +422,53 @@ async function buildBrief() {
     eps.sort((a,b) => new Date(b.release_date) - new Date(a.release_date));
 
     if (!eps.length) {
-      setStatus('error', 'No episodes found. They may not be available in your region.');
+      setStatus('error', 'No episodes found. Try selecting different podcasts.');
       document.getElementById('episodes-area').innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><h3>No episodes found</h3><p>Try selecting different podcasts.</p></div>`;
       btn.disabled = false; return;
     }
-
     currentEpisodes = eps;
 
-    // 2. Create a Spotify playlist with episode links in the description
-    setStatus('loading', `Creating Spotify playlist…`);
-    const playlistName = 'News Brief';
-    const date = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-    const showNames = [...new Set(eps.map(e => e.show_name))].join(', ');
-    const description = `${date} · ${eps.length} episodes · ${showNames}`;
-
-    // Step 1: silently delete previous playlist if it exists — never block on failure
+    // Delete previous playlist
     if (currentPlaylistId) {
       setStatus('loading', 'Removing previous playlist…');
       try {
-        const delResp = await sf(`https://api.spotify.com/v1/playlists/${currentPlaylistId}/followers`, { method: 'DELETE' });
-        console.log('Deleted old playlist', currentPlaylistId, 'status:', delResp.status);
-      } catch(e) {
-        console.warn('Could not delete old playlist (continuing anyway):', e.message);
-      }
+        await sf(`https://api.spotify.com/v1/playlists/${currentPlaylistId}/followers`, { method:'DELETE' });
+      } catch(e) { console.warn('Could not remove old playlist:', e.message); }
       currentPlaylistId = null;
       localStorage.removeItem('nb_playlist_id');
     }
 
-    // Step 2: create new playlist
+    // Create new playlist
     setStatus('loading', 'Creating Spotify playlist…');
-    const createResp = await sf(`https://api.spotify.com/v1/me/playlists`, {
+    const date = new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    const showNames = [...new Set(eps.map(e => e.show_name))].join(', ');
+    const createResp = await sf('https://api.spotify.com/v1/me/playlists', {
       method:'POST',
-      body: JSON.stringify({ name: playlistName, description, public: false })
+      body: JSON.stringify({ name:'News Brief', description:`${date} · ${eps.length} episodes · ${showNames}`, public:false })
     });
     const playlist = await createResp.json();
     if (playlist.error) throw new Error(`Could not create playlist: ${playlist.error.message}`);
-
-    currentPlaylistId = playlist.id;
-    localStorage.setItem('nb_playlist_id', currentPlaylistId);
+    currentPlaylistId  = playlist.id;
     currentPlaylistUrl = playlist.external_urls?.spotify || `https://open.spotify.com/playlist/${playlist.id}`;
-    const playlistUri = playlist.uri;
-    const playlistId = playlist.id;
+    localStorage.setItem('nb_playlist_id', currentPlaylistId);
 
-    // Add episodes using /items (the /tracks endpoint was removed Feb 2026, episode URIs are supported)
-    const uris = eps.map(e => e.uri).filter(u => u && u.startsWith('spotify:episode:'));
-    if (uris.length > 0) {
-      setStatus('loading', `Adding ${uris.length} episodes to playlist…`);
+    // Add episodes
+    const uris = eps.map(e => e.uri).filter(u => u?.startsWith('spotify:episode:'));
+    if (uris.length) {
+      setStatus('loading', `Adding ${uris.length} episode${uris.length!==1?'s':''} to playlist…`);
       for (let i = 0; i < uris.length; i += 100) {
-        const addResp = await sf(`https://api.spotify.com/v1/playlists/${playlistId}/items`, {
-          method: 'POST',
-          body: JSON.stringify({ uris: uris.slice(i, i + 100) })
+        const addResp = await sf(`https://api.spotify.com/v1/playlists/${currentPlaylistId}/items`, {
+          method:'POST', body: JSON.stringify({ uris: uris.slice(i, i+100) })
         });
         const addData = await addResp.json();
-        if (addData.error) {
-          console.warn('Could not add episodes to playlist:', addData.error.message);
-          // Don't throw — playlist was still created, just without episodes added via API
-        }
+        if (addData.error) console.warn('Could not add episodes:', addData.error.message);
       }
     }
 
-    // 3. Render playlist card
-    renderPlaylistCard(playlistName, date, eps.length, currentPlaylistUrl, playlistUri, eps);
-
-    // 4. Render episode list
+    renderPlaylistCard('News Brief', date, eps.length, currentPlaylistUrl);
     renderEpisodes(eps);
-
-    setStatus('success', `✓ Playlist created with ${eps.length} episodes. Click Open in Spotify or copy the link.`);
-    document.getElementById('main-sub').textContent = `Last built: ${new Date().toLocaleTimeString()} · ${eps.length} episodes`;
+    setStatus('success', `✓ Playlist created — ${eps.length} episode${eps.length!==1?'s':''} added.`);
+    document.getElementById('main-sub').textContent = `Last built: ${new Date().toLocaleTimeString()} · ${eps.length} episode${eps.length!==1?'s':''}`;
     btn.textContent = '↺ Rebuild';
   } catch(e) {
     setStatus('error', 'Error: ' + e.message);
@@ -567,8 +477,7 @@ async function buildBrief() {
   btn.disabled = false;
 }
 
-// ── Playlist Card ─────────────────────────────────────────────────────────
-function renderPlaylistCard(name, date, count, url, uri, eps) {
+function renderPlaylistCard(name, date, count, url) {
   document.getElementById('playlist-card-area').innerHTML = `
     <div class="playlist-card">
       <div class="pl-inner">
@@ -586,9 +495,9 @@ function renderPlaylistCard(name, date, count, url, uri, eps) {
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
               Copy Link
             </button>
-            <button class="pl-btn pl-btn-grey" onclick="downloadPlaylist()">
+            <button class="pl-btn pl-btn-grey" onclick="downloadBrief()">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Download .m3u
+              Download
             </button>
           </div>
         </div>
@@ -596,50 +505,39 @@ function renderPlaylistCard(name, date, count, url, uri, eps) {
     </div>`;
 }
 
-// ── Copy + Download ───────────────────────────────────────────────────────
 window.copyPlaylistLink = function() {
   if (!currentPlaylistUrl) return;
   navigator.clipboard.writeText(currentPlaylistUrl).then(() => {
-    const btns = document.querySelectorAll('.pl-btn-outline');
-    btns.forEach(b => { if (b.textContent.includes('Copy')) { b.textContent = '✓ Copied!'; setTimeout(() => b.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy Link`, 2000); } });
+    const btn = document.querySelector('.pl-btn-outline');
+    if (btn) { const orig = btn.innerHTML; btn.textContent = '✓ Copied!'; setTimeout(() => btn.innerHTML = orig, 2000); }
   });
 };
 
-window.downloadPlaylist = function() {
+window.downloadBrief = function() {
   if (!currentPlaylistUrl) return;
-  // Download a simple text file containing the playlist link
   const date = new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
-  const lines = [
-    `News Brief — ${date}`,
-    ``,
-    `Spotify Playlist Link:`,
-    currentPlaylistUrl,
-    ``,
-    `Episodes:`,
-  ];
+  const lines = [`News Brief — ${date}`, '', 'Spotify Playlist:', currentPlaylistUrl, '', 'Episodes:'];
   currentEpisodes.forEach((ep, i) => {
     const epId = ep.uri?.split(':').pop() || '';
     lines.push(`${i+1}. ${ep.show_name} — ${ep.name}`);
     lines.push(`   https://open.spotify.com/episode/${epId}`);
     lines.push('');
   });
-  const blob = new Blob([lines.join('\n')], {type:'text/plain'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `news-brief-${new Date().toISOString().slice(0,10)}.txt`;
-  a.click();
-  URL.revokeObjectURL(a.href);
+  const a = Object.assign(document.createElement('a'), {
+    href: URL.createObjectURL(new Blob([lines.join('\n')], {type:'text/plain'})),
+    download: `news-brief-${new Date().toISOString().slice(0,10)}.txt`
+  });
+  a.click(); URL.revokeObjectURL(a.href);
 };
 
-// ── Episodes ──────────────────────────────────────────────────────────────
 function renderEpisodes(eps) {
   document.getElementById('episodes-area').innerHTML =
-    `<div class="episodes-header">${eps.length} latest episode${eps.length!==1?'s':''} · Click ▶ Play to open each in Spotify</div>` +
+    `<div class="episodes-header">${eps.length} episode${eps.length!==1?'s':''} · Click ▶ Play to open in Spotify</div>` +
     eps.map((ep, i) => {
       const date = ep.release_date ? new Date(ep.release_date).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}) : '';
-      const dur = ep.duration_ms ? fmtDur(ep.duration_ms) : '';
+      const dur  = ep.duration_ms ? fmtDur(ep.duration_ms) : '';
       const epId = ep.uri?.split(':').pop() || '';
-      const url = `https://open.spotify.com/episode/${epId}`;
+      const epUrl = `https://open.spotify.com/episode/${epId}`;
       return `<div class="episode-row" style="animation-delay:${i*0.05}s">
         <div class="episode-num">${String(i+1).padStart(2,'0')}</div>
         <div>
@@ -649,7 +547,7 @@ function renderEpisodes(eps) {
         </div>
         <div class="episode-actions">
           ${dur?`<div class="episode-dur">${dur}</div>`:''}
-          <a class="ep-play-btn" href="${url}" target="_blank" rel="noopener">
+          <a class="ep-play-btn" href="${epUrl}" target="_blank" rel="noopener">
             <svg width="8" height="9" viewBox="0 0 8 9" fill="currentColor"><polygon points="0,0 8,4.5 0,9"/></svg>
             Play
           </a>
@@ -658,118 +556,16 @@ function renderEpisodes(eps) {
     }).join('');
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────
 function setStatus(type, msg) {
   document.getElementById('status-area').innerHTML =
     `<div class="status-bar ${type}"><div class="status-dot"></div><div class="status-text">${msg}</div></div>`;
   if (type === 'success') setTimeout(() => {
     const a = document.getElementById('status-area');
-    if (a.querySelector('.success')) a.innerHTML = '';
+    if (a?.querySelector('.success')) a.innerHTML = '';
   }, 7000);
 }
 function fmtDur(ms) { const m=Math.floor(ms/60000); return m<60?`${m}m`:`${Math.floor(m/60)}h ${m%60}m`; }
 function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-// ── Auto-refresh ───────────────────────────────────────────────────────────
-let autoRefreshTimer = null;
-let nextRefreshAt = null;
-let countdownTimer = null;
-
-function toggleAutoRefresh() {
-  const btn = document.getElementById('autorefresh-toggle');
-  const isOn = btn.classList.toggle('on');
-  document.getElementById('interval-row').style.display = isOn ? 'flex' : 'none';
-  document.getElementById('next-refresh-label').style.display = isOn ? 'block' : 'none';
-  if (isOn) {
-    scheduleRefresh();
-  } else {
-    clearAutoRefresh();
-  }
-  // Persist preference
-  localStorage.setItem('nb_autorefresh', isOn ? '1' : '0');
-  localStorage.setItem('nb_interval', document.getElementById('refresh-interval').value);
-}
-
-function scheduleRefresh() {
-  clearAutoRefresh();
-  const interval = parseInt(document.getElementById('refresh-interval').value);
-  nextRefreshAt = Date.now() + interval;
-  localStorage.setItem('nb_next_refresh', nextRefreshAt);
-  localStorage.setItem('nb_interval', interval);
-  autoRefreshTimer = setTimeout(async () => {
-    await buildBrief();
-    // Reschedule after build completes
-    const stillOn = document.getElementById('autorefresh-toggle').classList.contains('on');
-    if (stillOn) scheduleRefresh();
-  }, interval);
-  startCountdown();
-}
-
-function clearAutoRefresh() {
-  if (autoRefreshTimer) { clearTimeout(autoRefreshTimer); autoRefreshTimer = null; }
-  if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
-  nextRefreshAt = null;
-  localStorage.removeItem('nb_next_refresh');
-}
-
-function startCountdown() {
-  if (countdownTimer) clearInterval(countdownTimer);
-  const label = document.getElementById('next-refresh-label');
-  countdownTimer = setInterval(() => {
-    if (!nextRefreshAt) { clearInterval(countdownTimer); return; }
-    const ms = nextRefreshAt - Date.now();
-    if (ms <= 0) { label.textContent = 'Refreshing…'; clearInterval(countdownTimer); return; }
-    const h = Math.floor(ms / 3600000);
-    const m = Math.floor((ms % 3600000) / 60000);
-    const s = Math.floor((ms % 60000) / 1000);
-    const parts = [];
-    if (h > 0) parts.push(`${h}h`);
-    if (m > 0 || h > 0) parts.push(`${m}m`);
-    parts.push(`${s}s`);
-    label.textContent = `↺ Next refresh in ${parts.join(' ')}`;
-  }, 1000);
-}
-
-// Restore auto-refresh state on load (called after showApp)
-function restoreAutoRefreshState() {
-  const wasOn = localStorage.getItem('nb_autorefresh') === '1';
-  const savedInterval = localStorage.getItem('nb_interval');
-  const savedNext = localStorage.getItem('nb_next_refresh');
-  if (savedInterval) document.getElementById('refresh-interval').value = savedInterval;
-  if (wasOn) {
-    document.getElementById('autorefresh-toggle').classList.add('on');
-    document.getElementById('interval-row').style.display = 'flex';
-    document.getElementById('next-refresh-label').style.display = 'block';
-    // If the next refresh time has already passed, build immediately
-    if (savedNext && Date.now() >= parseInt(savedNext)) {
-      buildBrief().then(() => scheduleRefresh());
-    } else if (savedNext) {
-      // Resume countdown from where we left off
-      const remaining = parseInt(savedNext) - Date.now();
-      nextRefreshAt = parseInt(savedNext);
-      autoRefreshTimer = setTimeout(async () => {
-        await buildBrief();
-        const stillOn = document.getElementById('autorefresh-toggle').classList.contains('on');
-        if (stillOn) scheduleRefresh();
-      }, remaining);
-      startCountdown();
-    } else {
-      scheduleRefresh();
-    }
-  }
-}
-
-// Also reschedule when interval dropdown changes while auto-refresh is on
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('refresh-interval')?.addEventListener('change', () => {
-    const isOn = document.getElementById('autorefresh-toggle').classList.contains('on');
-    if (isOn) scheduleRefresh();
-    localStorage.setItem('nb_interval', document.getElementById('refresh-interval').value);
-  });
-  document.getElementById('eps-per-show')?.addEventListener('change', () => {
-    localStorage.setItem('nb_eps_per_show', document.getElementById('eps-per-show').value);
-  });
-});
 </script>
 </body>
 </html>
