@@ -1205,8 +1205,35 @@ async function upsertPlaylist(episodes) {
 function renderPlaylistCard(pl) {
   document.getElementById('pl-name').textContent = pl.name || 'Morning Brief';
   document.getElementById('pl-desc').textContent = `${pl.tracks?.total || 0} episodes · ${new Date().toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'})}`;
-  document.getElementById('pl-link').href = pl.external_urls?.spotify || '#';
+
+  const spotifyUrl = pl.external_urls?.spotify;
+  const playlistUri = pl.uri; // e.g. spotify:playlist:xxx — opens desktop app directly
+
+  const linkEl = document.getElementById('pl-link');
+  if (spotifyUrl) {
+    linkEl.href = spotifyUrl;
+    linkEl.title = spotifyUrl;
+  } else if (playlistUri) {
+    // Fallback: construct the open.spotify.com URL from the URI
+    const id = playlistUri.split(':').pop();
+    linkEl.href = `https://open.spotify.com/playlist/${id}`;
+  }
+
+  // Also show a second "Open in App" button using the spotify: URI scheme
+  const existingAppBtn = document.getElementById('pl-app-link');
+  if (existingAppBtn) existingAppBtn.remove();
+  if (playlistUri) {
+    const appBtn = document.createElement('a');
+    appBtn.id = 'pl-app-link';
+    appBtn.href = playlistUri;
+    appBtn.className = 'playlist-link';
+    appBtn.style.cssText = 'background:#111;color:#1DB954;border:1px solid #1DB954;margin-left:8px;';
+    appBtn.textContent = 'Open in App';
+    linkEl.parentNode.insertBefore(appBtn, linkEl.nextSibling);
+  }
+
   document.getElementById('playlist-card').classList.add('visible');
+  console.log('Playlist URL:', spotifyUrl, 'URI:', playlistUri);
 }
 
 function renderEpisodes(episodes) {
