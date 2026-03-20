@@ -432,9 +432,13 @@ async function loadShows() {
       return a.name.localeCompare(b.name);
     });
 
+    console.log('loadShows: allShows.length=', allShows.length, 'selectedShows.size=', selectedShows.size);
+    console.log('show-list el:', document.getElementById('show-list'));
     renderShows();
+    console.log('show-list innerHTML length after renderShows:', document.getElementById('show-list').innerHTML.length);
     updateCount();
   } catch(e) {
+    console.error('loadShows error:', e);
     listEl.innerHTML = `<div style="color:#e08080;font-family:var(--mono);font-size:0.72rem;line-height:1.7;padding:8px 0">Error: ${e.message}<br><a href="#" onclick="logout();return false;" style="color:var(--green)">Disconnect and reconnect</a></div>`;
   }
 }
