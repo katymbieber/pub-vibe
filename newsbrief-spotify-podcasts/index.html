@@ -1137,22 +1137,11 @@ async function upsertPlaylist(episodes) {
   const plName = document.getElementById('playlist-name-setting').value.trim() || 'Morning Brief';
   const isPublic = document.getElementById('public-toggle').classList.contains('on');
 
-  // Find existing playlist or create
+  // Always create a fresh playlist owned by this token to avoid 403s from
+  // playlists created in a previous session that this token can't write to.
+  // If we already have a playlistId from this session, reuse it; otherwise create new.
   if (!playlistId) {
-    // Search user playlists for one we made before
-    let url = `https://api.spotify.com/v1/users/${userId}/playlists?limit=50`;
-    while (url) {
-      const r = await spotifyFetch(url);
-      const data = await r.json();
-      const found = data.items?.find(p => p.name === plName && p.description?.includes('MorningBrief'));
-      if (found) { playlistId = found.id; break; }
-      url = data.next;
-    }
-  }
-
-  if (!playlistId) {
-    // Create
-    const r = await spotifyFetch(`https://api.spotify.com/v1/users/${userId}/playlists`, {
+    const createResp = await spotifyFetch(`https://api.spotify.com/v1/users/${userId}/playlists`, {
       method: 'POST',
       body: JSON.stringify({
         name: plName,
@@ -1160,11 +1149,12 @@ async function upsertPlaylist(episodes) {
         public: isPublic
       })
     });
-    const pl = await r.json();
-    playlistId = pl.id;
+    const createData = await createResp.json();
+    if (createData.error) throw new Error(`Failed to create playlist: ${createData.error.message}`);
+    playlistId = createData.id;
   } else {
-    // Update description
-    await spotifyFetch(`https://api.spotify.com/v1/playlists/${playlistId}`, {
+    // Update name/description of existing session playlist
+    const updateResp = await spotifyFetch(`https://api.spotify.com/v1/playlists/${playlistId}`, {
       method: 'PUT',
       body: JSON.stringify({
         name: plName,
@@ -1172,21 +1162,24 @@ async function upsertPlaylist(episodes) {
         public: isPublic
       })
     });
+    const updateData = await updateResp.json();
+    // A 403 here means we don't own this playlist — clear it and recurse once
+    if (updateData.error && updateData.error.status === 403) {
+      playlistId = null;
+      return upsertPlaylist(episodes);
+    }
   }
 
-  // Podcast episodes must be added via the /tracks endpoint using their episode URIs.
-  // Spotify supports episode URIs (spotify:episode:xxx) in playlists for Premium users.
   const uris = episodes.map(e => e.uri).filter(u => u && u.startsWith('spotify:episode:'));
+  if (uris.length === 0) throw new Error('No valid episode URIs found.');
 
-  if (uris.length === 0) throw new Error('No valid episode URIs found. Episodes may not be available in your region or account type.');
-
-  // PUT replaces all items; then POST appends for overflow
+  // PUT replaces all existing items with the first batch
   const putResp = await spotifyFetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
     method: 'PUT',
     body: JSON.stringify({ uris: uris.slice(0, 100) })
   });
   const putData = await putResp.json();
-  if (putData.error) throw new Error(`Failed to add episodes: ${putData.error.message}`);
+  if (putData.error) throw new Error(`Failed to add episodes: ${putData.error.message} (playlist: ${playlistId})`);
 
   for (let i = 100; i < uris.length; i += 100) {
     const postResp = await spotifyFetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
