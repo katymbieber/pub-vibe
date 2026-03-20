@@ -409,7 +409,29 @@ async function loadShows() {
     } catch(e) { console.warn('Could not fetch audiobooks:', e.message); }
 
     allShows = shows.filter(s => !audiobookIds.has(s.id));
-    allShows.forEach(s => { if (CURATED.some(n => s.name.toLowerCase().includes(n))) selectedShows.add(s.id); });
+
+    // Restore previously saved selections
+    const savedSelected = localStorage.getItem('nb_selected');
+    if (savedSelected) {
+      try {
+        const ids = JSON.parse(savedSelected);
+        // Only restore IDs that still exist in the current show list
+        ids.forEach(id => { if (allShows.find(s => s.id === id)) selectedShows.add(id); });
+      } catch(e) { console.warn('Could not restore selections:', e); }
+    }
+
+    // If no saved selections, pre-select curated news shows
+    if (selectedShows.size === 0) {
+      allShows.forEach(s => { if (CURATED.some(n => s.name.toLowerCase().includes(n))) selectedShows.add(s.id); });
+    }
+
+    // Sort: selected first, then alphabetically within each group
+    allShows.sort((a, b) => {
+      const aOn = selectedShows.has(a.id), bOn = selectedShows.has(b.id);
+      if (aOn !== bOn) return aOn ? -1 : 1;
+      return a.name.localeCompare(b.name);
+    });
+
     renderShows();
     updateCount();
   } catch(e) {
@@ -441,6 +463,18 @@ function toggleShow(id, el) {
   if (selectedShows.has(id)) { selectedShows.delete(id); el.classList.remove('checked'); chk.innerHTML = ''; }
   else { selectedShows.add(id); el.classList.add('checked'); chk.innerHTML = chkSvg(); }
   updateCount();
+  saveSelectedShows();
+}
+
+function saveSelectedShows() {
+  localStorage.setItem('nb_selected', JSON.stringify([...selectedShows]));
+  // Re-sort and re-render so selected items float to the top
+  allShows.sort((a, b) => {
+    const aOn = selectedShows.has(a.id), bOn = selectedShows.has(b.id);
+    if (aOn !== bOn) return aOn ? -1 : 1;
+    return a.name.localeCompare(b.name);
+  });
+  renderShows();
 }
 function updateCount() {
   document.getElementById('sel-count').textContent = selectedShows.size;

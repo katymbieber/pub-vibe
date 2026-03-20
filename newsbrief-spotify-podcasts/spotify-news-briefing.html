@@ -57,7 +57,7 @@
   .user-name { font-size:0.88rem; font-weight:500; color:var(--warm); }
   .user-meta { font-family:var(--mono); font-size:0.62rem; color:var(--muted); margin-top:2px; }
   .sidebar-label { font-family:var(--mono); font-size:0.63rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid #1e1e1e; }
-  .show-list { flex:1; overflow-y:auto; margin-bottom:16px; }
+  .show-list { margin-bottom:16px; max-height:40vh; overflow-y:auto; }
 
   .show-item { display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid #161616; cursor:pointer; }
   .show-item:hover { opacity:0.85; }
@@ -123,6 +123,21 @@
   .empty-state p { font-size:0.82rem; line-height:1.6; }
   .skeleton { background:linear-gradient(90deg,#141414 25%,#1a1a1a 50%,#141414 75%); background-size:200% 100%; animation:shimmer 1.5s infinite; border-radius:3px; height:60px; margin-bottom:10px; }
 
+  /* SETTINGS */
+  .settings-panel { background:#0d0d0d; border:1px solid #1e1e1e; border-radius:3px; padding:14px 16px; margin-bottom:12px; flex-shrink:0; }
+  .settings-title { font-family:var(--mono); font-size:0.6rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--muted); margin-bottom:12px; }
+  .setting-row { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:10px; }
+  .setting-row:last-child { margin-bottom:0; }
+  .setting-label { font-family:var(--mono); font-size:0.67rem; color:var(--paper); }
+  .setting-sub { font-family:var(--mono); font-size:0.57rem; color:var(--muted); margin-top:2px; }
+  .setting-select { background:#1a1a1a; border:1px solid #2a2a2a; border-radius:3px; padding:5px 8px; font-family:var(--mono); font-size:0.67rem; color:var(--paper); outline:none; cursor:pointer; }
+  .setting-select:focus { border-color:var(--green); }
+  .toggle-btn { width:36px; height:20px; background:#2a2a2a; border-radius:10px; border:none; cursor:pointer; position:relative; transition:background .2s; flex-shrink:0; }
+  .toggle-btn::after { content:''; position:absolute; top:2px; left:2px; width:16px; height:16px; background:#555; border-radius:50%; transition:all .2s; }
+  .toggle-btn.on { background:var(--green); }
+  .toggle-btn.on::after { left:18px; background:var(--black); }
+  .countdown { font-family:var(--mono); font-size:0.6rem; color:var(--green); text-align:center; margin-top:8px; padding-top:8px; border-top:1px solid #1e1e1e; }
+
   @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
   @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
@@ -180,6 +195,37 @@
       <div class="show-list" id="show-list">
         <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
       </div>
+      <div class="settings-panel">
+        <div class="settings-title">Settings</div>
+        <div class="setting-row">
+          <div class="setting-label">Episodes per show</div>
+          <select class="setting-select" id="eps-per-show" onchange="localStorage.setItem('nb_eps',this.value)">
+            <option value="1" selected>1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="5">5</option>
+          </select>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Auto-refresh</div>
+            <div class="setting-sub">Rebuild on a schedule</div>
+          </div>
+          <button class="toggle-btn" id="ar-toggle" onclick="toggleAutoRefresh()"></button>
+        </div>
+        <div class="setting-row" id="ar-interval-row" style="display:none;">
+          <div class="setting-label">Interval</div>
+          <select class="setting-select" id="ar-interval" onchange="onIntervalChange()">
+            <option value="3600000">Every hour</option>
+            <option value="10800000">Every 3 hrs</option>
+            <option value="21600000" selected>Every 6 hrs</option>
+            <option value="43200000">Every 12 hrs</option>
+            <option value="86400000">Every 24 hrs</option>
+          </select>
+        </div>
+        <div class="countdown" id="ar-countdown" style="display:none;"></div>
+      </div>
+
       <div class="sidebar-actions">
         <div class="sel-count"><span id="sel-count">0</span> selected</div>
         <button class="btn btn-primary" id="build-btn" onclick="buildBrief()" disabled>▶ Build News Brief</button>
@@ -295,7 +341,8 @@ async function exchangeCode(code) {
 }
 
 function logout() {
-  ['nb_token','nb_token_expiry','nb_pkce_verifier','nb_client_id','nb_playlist_id'].forEach(k => localStorage.removeItem(k));
+  cancelRefresh();
+  ['nb_token','nb_token_expiry','nb_pkce_verifier','nb_client_id','nb_playlist_id','nb_ar_on','nb_ar_next','nb_ar_interval','nb_eps'].forEach(k => localStorage.removeItem(k));
   accessToken = null; userId = null; allShows = []; selectedShows = new Set();
   currentEpisodes = []; currentPlaylistUrl = null; currentPlaylistId = null;
   document.getElementById('landing').style.display = '';
@@ -319,7 +366,8 @@ async function showApp() {
   document.getElementById('landing').style.display = 'none';
   document.getElementById('app').classList.add('visible');
   await loadProfile();
-  await loadShows();
+  await loadShows();  // must finish before restoreSettings touches selectedShows
+  restoreSettings();
 }
 
 async function loadProfile() {
@@ -414,7 +462,8 @@ async function buildBrief() {
     const eps = [];
     for (const id of [...selectedShows]) {
       try {
-        const d = await sfJSON(`https://api.spotify.com/v1/shows/${id}/episodes?limit=1`);
+        const epsPerShow = parseInt(document.getElementById('eps-per-show').value) || 1;
+        const d = await sfJSON(`https://api.spotify.com/v1/shows/${id}/episodes?limit=${epsPerShow}`);
         const show = allShows.find(s => s.id === id);
         (d.items||[]).forEach(ep => { if (ep?.uri) eps.push({...ep, show_name: show?.name||'Unknown'}); });
       } catch(e) { console.warn('Skipped show', id, e.message); }
@@ -566,6 +615,97 @@ function setStatus(type, msg) {
 }
 function fmtDur(ms) { const m=Math.floor(ms/60000); return m<60?`${m}m`:`${Math.floor(m/60)}h ${m%60}m`; }
 function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── Settings restore (called once after showApp loads shows) ────────────────
+// ── Auto-refresh state (declared here so all functions can reference them) ──
+let arTimer = null, arCountdownTimer = null, arNextAt = null;
+
+function restoreSettings() {
+  const eps = localStorage.getItem('nb_eps');
+  if (eps) document.getElementById('eps-per-show').value = eps;
+
+  const interval = localStorage.getItem('nb_ar_interval');
+  if (interval) document.getElementById('ar-interval').value = interval;
+
+  const arOn = localStorage.getItem('nb_ar_on') === '1';
+  if (arOn) {
+    document.getElementById('ar-toggle').classList.add('on');
+    document.getElementById('ar-interval-row').style.display = 'flex';
+    document.getElementById('ar-countdown').style.display = 'block';
+    const savedNext = parseInt(localStorage.getItem('nb_ar_next') || '0');
+    if (savedNext && Date.now() >= savedNext) {
+      // Missed a scheduled refresh — run now then reschedule
+      if (selectedShows.size > 0) buildBrief().then(scheduleRefresh);
+      else scheduleRefresh();
+    } else if (savedNext) {
+      // Resume existing countdown
+      arNextAt = savedNext;
+      const remaining = savedNext - Date.now();
+      arTimer = setTimeout(() => { if (selectedShows.size > 0) buildBrief().then(scheduleRefresh); else scheduleRefresh(); }, remaining);
+      tickCountdown();
+    } else {
+      scheduleRefresh();
+    }
+  }
+}
+
+// ── Auto-refresh ─────────────────────────────────────────────────────────────
+function toggleAutoRefresh() {
+  const btn = document.getElementById('ar-toggle');
+  const on = btn.classList.toggle('on');
+  document.getElementById('ar-interval-row').style.display = on ? 'flex' : 'none';
+  document.getElementById('ar-countdown').style.display    = on ? 'block' : 'none';
+  localStorage.setItem('nb_ar_on', on ? '1' : '0');
+  if (on) scheduleRefresh();
+  else    cancelRefresh();
+}
+
+function onIntervalChange() {
+  localStorage.setItem('nb_ar_interval', document.getElementById('ar-interval').value);
+  if (document.getElementById('ar-toggle').classList.contains('on')) scheduleRefresh();
+}
+
+function scheduleRefresh() {
+  cancelRefresh();
+  const ms = parseInt(document.getElementById('ar-interval').value);
+  arNextAt = Date.now() + ms;
+  localStorage.setItem('nb_ar_interval', ms);
+  localStorage.setItem('nb_ar_next', arNextAt);
+  arTimer = setTimeout(async () => {
+    if (document.getElementById('ar-toggle').classList.contains('on')) {
+      if (selectedShows.size > 0) await buildBrief();
+      scheduleRefresh();
+    }
+  }, ms);
+  tickCountdown();
+}
+
+function cancelRefresh() {
+  if (arTimer)          { clearTimeout(arTimer);          arTimer = null; }
+  if (arCountdownTimer) { clearInterval(arCountdownTimer); arCountdownTimer = null; }
+  arNextAt = null;
+  localStorage.removeItem('nb_ar_next');
+  const el = document.getElementById('ar-countdown');
+  if (el) el.textContent = '';
+}
+
+function tickCountdown() {
+  if (arCountdownTimer) clearInterval(arCountdownTimer);
+  const el = document.getElementById('ar-countdown');
+  arCountdownTimer = setInterval(() => {
+    if (!arNextAt) return;
+    const ms = arNextAt - Date.now();
+    if (ms <= 0) { el.textContent = 'Refreshing…'; return; }
+    const h = Math.floor(ms / 3600000);
+    const m = Math.floor((ms % 3600000) / 60000);
+    const s = Math.floor((ms % 60000) / 1000);
+    const parts = [];
+    if (h) parts.push(h + 'h');
+    if (m || h) parts.push(m + 'm');
+    parts.push(s + 's');
+    el.textContent = '↺ next refresh in ' + parts.join(' ');
+  }, 1000);
+}
 </script>
 </body>
 </html>
