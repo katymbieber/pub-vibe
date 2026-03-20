@@ -140,7 +140,7 @@
 <body>
 
 <div class="masthead">
-  <div class="masthead-title">Morning<span>Brief</span></div>
+  <div class="masthead-title">News<span>Brief</span></div>
   <div class="masthead-date" id="today-date"></div>
   <div class="masthead-badge">Daily News</div>
 </div>
@@ -215,7 +215,7 @@
 <script>
 let accessToken = null, userId = null, userMarket = 'US';
 let allShows = [], selectedShows = new Set();
-let currentEpisodes = [], currentPlaylistUrl = null;
+let currentEpisodes = [], currentPlaylistUrl = null, currentPlaylistId = null;
 
 const SCOPES = ['user-read-private','user-read-email','user-follow-read','user-library-read',
                 'playlist-modify-public','playlist-modify-private'].join(' ');
@@ -240,6 +240,8 @@ window.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('redirect-hint').textContent = getRedirectUri();
   const saved = localStorage.getItem('mb_client_id');
   if (saved) document.getElementById('client-id-input').value = saved;
+
+  currentPlaylistId = localStorage.getItem('mb_playlist_id') || null;
 
   const params = new URLSearchParams(window.location.search);
   const code = params.get('code');
@@ -290,7 +292,7 @@ async function exchangeCode(code) {
 }
 
 function logout() {
-  ['mb_token','mb_token_expiry','mb_pkce_verifier','mb_client_id'].forEach(k => localStorage.removeItem(k));
+  ['mb_token','mb_token_expiry','mb_pkce_verifier','mb_client_id','mb_playlist_id'].forEach(k => localStorage.removeItem(k));
   accessToken = null; userId = null; allShows = []; selectedShows = new Set();
   document.getElementById('landing').style.display = '';
   document.getElementById('app').classList.remove('visible');
@@ -421,7 +423,18 @@ async function buildBrief() {
     const showNames = [...new Set(eps.map(e => e.show_name))].join(', ');
     const description = `${date} · ${eps.length} episodes · ${showNames}`;
 
-    // Create playlist using /me/playlists (the /users/{id}/playlists endpoint was removed Feb 2026)
+    // Delete previous playlist if one exists from a prior build
+    if (currentPlaylistId) {
+      setStatus('loading', 'Removing previous playlist…');
+      try {
+        await sf(`https://api.spotify.com/v1/playlists/${currentPlaylistId}/followers`, { method: 'DELETE' });
+      } catch(e) { console.warn('Could not delete old playlist:', e.message); }
+      currentPlaylistId = null;
+      localStorage.removeItem('mb_playlist_id');
+    }
+
+    // Create fresh playlist using /me/playlists
+    setStatus('loading', 'Creating Spotify playlist…');
     const createResp = await sf(`https://api.spotify.com/v1/me/playlists`, {
       method:'POST',
       body: JSON.stringify({ name: playlistName, description, public: false })
@@ -429,6 +442,8 @@ async function buildBrief() {
     const playlist = await createResp.json();
     if (playlist.error) throw new Error(`Could not create playlist: ${playlist.error.message}`);
 
+    currentPlaylistId = playlist.id;
+    localStorage.setItem('mb_playlist_id', currentPlaylistId);
     currentPlaylistUrl = playlist.external_urls?.spotify || `https://open.spotify.com/playlist/${playlist.id}`;
     const playlistUri = playlist.uri;
     const playlistId = playlist.id;
