@@ -892,6 +892,7 @@ async function startAuth() {
   url.searchParams.set('redirect_uri', redirect);
   url.searchParams.set('code_challenge_method', 'S256');
   url.searchParams.set('code_challenge', challenge);
+  url.searchParams.set('show_dialog', 'true');
   window.location.href = url.toString();
 }
 
@@ -950,12 +951,21 @@ async function spotifyFetch(url, opts = {}) {
   return r;
 }
 
+async function spotifyFetchJSON(url, opts = {}) {
+  const r = await spotifyFetch(url, opts);
+  const data = await r.json();
+  if (data.error) throw new Error(`Spotify ${data.error.status}: ${data.error.message}`);
+  return data;
+}
+
 // ── Profile ────────────────────────────────────────────────────────────────
+let userMarket = 'US';
 async function loadProfile() {
   try {
     const r = await spotifyFetch('https://api.spotify.com/v1/me');
     const data = await r.json();
     userId = data.id;
+    userMarket = data.country || 'US';
     document.getElementById('user-name-el').textContent = data.display_name || data.id;
     document.getElementById('user-meta-el').textContent = `${data.followers?.total?.toLocaleString() || 0} followers`;
     const av = document.getElementById('user-avatar-el');
@@ -1106,15 +1116,19 @@ async function fetchLatestEpisodes(showIds, onePerShow) {
   const episodes = [];
   for (const id of showIds) {
     try {
-      const r = await spotifyFetch(`https://api.spotify.com/v1/shows/${id}/episodes?limit=${onePerShow?1:3}&market=US`);
-      const data = await r.json();
-      if (data.items) {
-        const show = allShows.find(s => s.id === id);
-        data.items.forEach(ep => episodes.push({ ...ep, show_name: show?.name || 'Unknown Show' }));
-      }
-    } catch(e) { console.warn(`Failed to fetch episodes for ${id}:`, e); }
+      const limit = onePerShow ? 1 : 3;
+      const data = await spotifyFetchJSON(
+        `https://api.spotify.com/v1/shows/${id}/episodes?limit=${limit}&market=${userMarket}`
+      );
+      const show = allShows.find(s => s.id === id);
+      (data.items || []).forEach(ep => {
+        if (ep && ep.uri) episodes.push({ ...ep, show_name: show?.name || 'Unknown Show' });
+      });
+    } catch(e) {
+      console.warn(`Failed to fetch episodes for show ${id}:`, e.message);
+      setStatus('loading', `Fetching episodes… (skipped one show: ${e.message})`);
+    }
   }
-  // Sort by release date desc
   episodes.sort((a,b) => new Date(b.release_date) - new Date(a.release_date));
   return episodes;
 }
@@ -1160,18 +1174,27 @@ async function upsertPlaylist(episodes) {
     });
   }
 
-  // Replace tracks
-  const uris = episodes.map(e => e.uri).filter(Boolean);
-  // Clear then add in chunks of 100
-  await spotifyFetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
+  // Podcast episodes must be added via the /tracks endpoint using their episode URIs.
+  // Spotify supports episode URIs (spotify:episode:xxx) in playlists for Premium users.
+  const uris = episodes.map(e => e.uri).filter(u => u && u.startsWith('spotify:episode:'));
+
+  if (uris.length === 0) throw new Error('No valid episode URIs found. Episodes may not be available in your region or account type.');
+
+  // PUT replaces all items; then POST appends for overflow
+  const putResp = await spotifyFetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
     method: 'PUT',
     body: JSON.stringify({ uris: uris.slice(0, 100) })
   });
+  const putData = await putResp.json();
+  if (putData.error) throw new Error(`Failed to add episodes: ${putData.error.message}`);
+
   for (let i = 100; i < uris.length; i += 100) {
-    await spotifyFetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
+    const postResp = await spotifyFetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
       method: 'POST',
       body: JSON.stringify({ uris: uris.slice(i, i+100) })
     });
+    const postData = await postResp.json();
+    if (postData.error) throw new Error(`Failed to add episodes (chunk ${i}): ${postData.error.message}`);
   }
 
   const r = await spotifyFetch(`https://api.spotify.com/v1/playlists/${playlistId}`);
