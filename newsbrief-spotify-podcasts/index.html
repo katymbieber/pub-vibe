@@ -130,6 +130,22 @@
   .empty-state p { font-size:0.82rem; line-height:1.6; }
   .skeleton { background:linear-gradient(90deg,#141414 25%,#1a1a1a 50%,#141414 75%); background-size:200% 100%; animation:shimmer 1.5s infinite; border-radius:3px; height:60px; margin-bottom:10px; }
 
+  /* SETTINGS PANEL */
+  .settings-panel { background:#0d0d0d; border:1px solid #1e1e1e; border-radius:3px; padding:16px; margin-bottom:12px; }
+  .settings-title { font-family:var(--mono); font-size:0.62rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--muted); margin-bottom:12px; }
+  .setting-row { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
+  .setting-row:last-child { margin-bottom:0; }
+  .setting-label { font-family:var(--mono); font-size:0.68rem; color:var(--paper); }
+  .setting-sub { font-family:var(--mono); font-size:0.58rem; color:var(--muted); margin-top:2px; }
+  .setting-control { flex-shrink:0; }
+  select.setting-select { background:#1a1a1a; border:1px solid #2a2a2a; border-radius:3px; padding:5px 8px; font-family:var(--mono); font-size:0.68rem; color:var(--paper); outline:none; cursor:pointer; }
+  select.setting-select:focus { border-color:var(--green); }
+  .toggle-btn { width:36px; height:20px; background:#2a2a2a; border-radius:10px; border:none; cursor:pointer; position:relative; transition:background .2s; flex-shrink:0; }
+  .toggle-btn::after { content:''; position:absolute; top:2px; left:2px; width:16px; height:16px; background:#555; border-radius:50%; transition:all .2s; }
+  .toggle-btn.on { background:var(--green); }
+  .toggle-btn.on::after { left:18px; background:var(--black); }
+  .next-refresh { font-family:var(--mono); font-size:0.62rem; color:var(--green); text-align:center; margin-top:6px; }
+
   @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
   @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
@@ -187,6 +203,47 @@
       <div class="show-list" id="show-list">
         <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
       </div>
+      <div class="settings-panel">
+        <div class="settings-title">Settings</div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Episodes per show</div>
+          </div>
+          <div class="setting-control">
+            <select class="setting-select" id="eps-per-show">
+              <option value="1" selected>1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="5">5</option>
+            </select>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Auto-refresh</div>
+            <div class="setting-sub">Rebuild playlist automatically</div>
+          </div>
+          <div class="setting-control">
+            <button class="toggle-btn" id="autorefresh-toggle" onclick="toggleAutoRefresh()"></button>
+          </div>
+        </div>
+        <div class="setting-row" id="interval-row" style="display:none;">
+          <div>
+            <div class="setting-label">Interval</div>
+          </div>
+          <div class="setting-control">
+            <select class="setting-select" id="refresh-interval">
+              <option value="3600000">Every hour</option>
+              <option value="10800000">Every 3 hours</option>
+              <option value="21600000" selected>Every 6 hours</option>
+              <option value="43200000">Every 12 hours</option>
+              <option value="86400000">Every 24 hours</option>
+            </select>
+          </div>
+        </div>
+        <div class="next-refresh" id="next-refresh-label" style="display:none;"></div>
+      </div>
+
       <div class="sidebar-actions">
         <div class="sel-count"><span id="sel-count">0</span> selected</div>
         <button class="btn btn-primary" id="fetch-btn" onclick="buildBrief()" disabled>▶ Build News Brief</button>
@@ -242,6 +299,10 @@ window.addEventListener('DOMContentLoaded', async () => {
   if (saved) document.getElementById('client-id-input').value = saved;
 
   currentPlaylistId = localStorage.getItem('nb_playlist_id') || null;
+
+  // Restore episodes-per-show setting
+  const savedEps = localStorage.getItem('nb_eps_per_show');
+  if (savedEps) { const el = document.getElementById('eps-per-show'); if (el) el.value = savedEps; }
 
   const params = new URLSearchParams(window.location.search);
   const code = params.get('code');
@@ -318,6 +379,7 @@ async function showApp() {
   document.getElementById('app').classList.add('visible');
   await loadProfile();
   await loadShows();
+  restoreAutoRefreshState();
 }
 
 async function loadProfile() {
@@ -421,7 +483,8 @@ async function buildBrief() {
     const eps = [];
     for (const id of [...selectedShows]) {
       try {
-        const d = await sfJSON(`https://api.spotify.com/v1/shows/${id}/episodes?limit=1&market=${userMarket}`);
+        const epsPerShow = parseInt(document.getElementById('eps-per-show').value) || 1;
+        const d = await sfJSON(`https://api.spotify.com/v1/shows/${id}/episodes?limit=${epsPerShow}&market=${userMarket}`);
         const show = allShows.find(s => s.id === id);
         (d.items||[]).forEach(ep => { if (ep?.uri) eps.push({...ep, show_name: show?.name||'Unknown'}); });
       } catch(e) { console.warn('Skipped show', id, e.message); }
@@ -606,6 +669,107 @@ function setStatus(type, msg) {
 }
 function fmtDur(ms) { const m=Math.floor(ms/60000); return m<60?`${m}m`:`${Math.floor(m/60)}h ${m%60}m`; }
 function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── Auto-refresh ───────────────────────────────────────────────────────────
+let autoRefreshTimer = null;
+let nextRefreshAt = null;
+let countdownTimer = null;
+
+function toggleAutoRefresh() {
+  const btn = document.getElementById('autorefresh-toggle');
+  const isOn = btn.classList.toggle('on');
+  document.getElementById('interval-row').style.display = isOn ? 'flex' : 'none';
+  document.getElementById('next-refresh-label').style.display = isOn ? 'block' : 'none';
+  if (isOn) {
+    scheduleRefresh();
+  } else {
+    clearAutoRefresh();
+  }
+  // Persist preference
+  localStorage.setItem('nb_autorefresh', isOn ? '1' : '0');
+  localStorage.setItem('nb_interval', document.getElementById('refresh-interval').value);
+}
+
+function scheduleRefresh() {
+  clearAutoRefresh();
+  const interval = parseInt(document.getElementById('refresh-interval').value);
+  nextRefreshAt = Date.now() + interval;
+  localStorage.setItem('nb_next_refresh', nextRefreshAt);
+  localStorage.setItem('nb_interval', interval);
+  autoRefreshTimer = setTimeout(async () => {
+    await buildBrief();
+    // Reschedule after build completes
+    const stillOn = document.getElementById('autorefresh-toggle').classList.contains('on');
+    if (stillOn) scheduleRefresh();
+  }, interval);
+  startCountdown();
+}
+
+function clearAutoRefresh() {
+  if (autoRefreshTimer) { clearTimeout(autoRefreshTimer); autoRefreshTimer = null; }
+  if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+  nextRefreshAt = null;
+  localStorage.removeItem('nb_next_refresh');
+}
+
+function startCountdown() {
+  if (countdownTimer) clearInterval(countdownTimer);
+  const label = document.getElementById('next-refresh-label');
+  countdownTimer = setInterval(() => {
+    if (!nextRefreshAt) { clearInterval(countdownTimer); return; }
+    const ms = nextRefreshAt - Date.now();
+    if (ms <= 0) { label.textContent = 'Refreshing…'; clearInterval(countdownTimer); return; }
+    const h = Math.floor(ms / 3600000);
+    const m = Math.floor((ms % 3600000) / 60000);
+    const s = Math.floor((ms % 60000) / 1000);
+    const parts = [];
+    if (h > 0) parts.push(`${h}h`);
+    if (m > 0 || h > 0) parts.push(`${m}m`);
+    parts.push(`${s}s`);
+    label.textContent = `↺ Next refresh in ${parts.join(' ')}`;
+  }, 1000);
+}
+
+// Restore auto-refresh state on load (called after showApp)
+function restoreAutoRefreshState() {
+  const wasOn = localStorage.getItem('nb_autorefresh') === '1';
+  const savedInterval = localStorage.getItem('nb_interval');
+  const savedNext = localStorage.getItem('nb_next_refresh');
+  if (savedInterval) document.getElementById('refresh-interval').value = savedInterval;
+  if (wasOn) {
+    document.getElementById('autorefresh-toggle').classList.add('on');
+    document.getElementById('interval-row').style.display = 'flex';
+    document.getElementById('next-refresh-label').style.display = 'block';
+    // If the next refresh time has already passed, build immediately
+    if (savedNext && Date.now() >= parseInt(savedNext)) {
+      buildBrief().then(() => scheduleRefresh());
+    } else if (savedNext) {
+      // Resume countdown from where we left off
+      const remaining = parseInt(savedNext) - Date.now();
+      nextRefreshAt = parseInt(savedNext);
+      autoRefreshTimer = setTimeout(async () => {
+        await buildBrief();
+        const stillOn = document.getElementById('autorefresh-toggle').classList.contains('on');
+        if (stillOn) scheduleRefresh();
+      }, remaining);
+      startCountdown();
+    } else {
+      scheduleRefresh();
+    }
+  }
+}
+
+// Also reschedule when interval dropdown changes while auto-refresh is on
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('refresh-interval')?.addEventListener('change', () => {
+    const isOn = document.getElementById('autorefresh-toggle').classList.contains('on');
+    if (isOn) scheduleRefresh();
+    localStorage.setItem('nb_interval', document.getElementById('refresh-interval').value);
+  });
+  document.getElementById('eps-per-show')?.addEventListener('change', () => {
+    localStorage.setItem('nb_eps_per_show', document.getElementById('eps-per-show').value);
+  });
+});
 </script>
 </body>
 </html>
