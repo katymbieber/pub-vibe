@@ -345,8 +345,11 @@ async function loadShows() {
       shows = shows.concat(d.items.map(i => i.show).filter(Boolean));
       url = d.next || null;
     }
-    allShows = shows;
-    shows.forEach(s => { if (CURATED.some(n => s.name.toLowerCase().includes(n))) selectedShows.add(s.id); });
+    // /me/shows should only return podcasts, but Spotify sometimes includes audiobooks.
+    // Filter to only items where type === 'show' (podcasts), excluding 'audiobook' type.
+    const filtered = shows.filter(s => s.type === 'show');
+    allShows = filtered;
+    filtered.forEach(s => { if (CURATED.some(n => s.name.toLowerCase().includes(n))) selectedShows.add(s.id); });
     renderShows(); updateCount();
   } catch(e) {
     listEl.innerHTML = `<div style="color:#e08080;font-family:var(--mono);font-size:0.72rem;line-height:1.7;padding:8px 0">Error: ${e.message}<br><a href="#" onclick="logout();return false;" style="color:var(--green)">Disconnect and reconnect</a></div>`;
