@@ -345,9 +345,27 @@ async function loadShows() {
       shows = shows.concat(d.items.map(i => i.show).filter(Boolean));
       url = d.next || null;
     }
-    // /me/shows should only return podcasts, but Spotify sometimes includes audiobooks.
-    // Filter to only items where type === 'show' (podcasts), excluding 'audiobook' type.
-    const filtered = shows.filter(s => s.type === 'show');
+    // Log all shows so we can see what fields audiobooks have
+    console.log('All shows from API:', shows.map(s => ({
+      name: s.name, type: s.type, media_type: s.media_type,
+      show_type: s.show_type, kind: s.kind, is_externally_hosted: s.is_externally_hosted
+    })));
+
+    // Filter out audiobooks — check every field that could distinguish them
+    const filtered = shows.filter(s => {
+      const type = (s.type || '').toLowerCase();
+      const mediaType = (s.media_type || '').toLowerCase();
+      const showType = (s.show_type || '').toLowerCase();
+      const kind = (s.kind || '').toLowerCase();
+      const name = (s.name || '').toLowerCase();
+      // Log anything that looks like it might be an audiobook
+      if (type !== 'show' || mediaType.includes('audio') && !mediaType.includes('podcast')) {
+        console.log('Possible audiobook:', s.name, {type, mediaType, showType, kind});
+      }
+      return type === 'show' && !mediaType.includes('audiobook') && !showType.includes('audiobook') && !kind.includes('audiobook');
+    });
+
+    console.log('After filter:', filtered.map(s => s.name));
     allShows = filtered;
     filtered.forEach(s => { if (CURATED.some(n => s.name.toLowerCase().includes(n))) selectedShows.add(s.id); });
     renderShows(); updateCount();
