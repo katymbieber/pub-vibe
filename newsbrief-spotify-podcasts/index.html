@@ -721,6 +721,10 @@
         </div>
       </div>
 
+      <div id="debug-panel" style="display:none;margin-bottom:12px;">
+        <div style="background:#0d0d0d;border:1px solid #2a2a2a;border-radius:3px;padding:10px;font-family:var(--mono);font-size:0.62rem;color:#aaa;max-height:200px;overflow-y:auto;white-space:pre-wrap;word-break:break-all;" id="debug-output">...</div>
+      </div>
+
       <div class="sidebar-actions">
         <div class="selected-count"><span id="sel-count">0</span> podcasts selected</div>
         <button class="btn btn-primary" id="build-btn" onclick="buildPlaylist()" disabled>
@@ -730,6 +734,7 @@
           ↺ Refresh Episodes
         </button>
         <button class="btn btn-danger" onclick="logout()">Disconnect</button>
+        <button class="btn btn-outline" style="font-size:0.65rem;padding:8px 12px;" onclick="runDiagnostic()">🔍 Diagnose API</button>
       </div>
     </div>
 
@@ -918,8 +923,12 @@ async function exchangeCode(code) {
 }
 
 function logout() {
-  localStorage.removeItem('mb_token');
+  ['mb_token','mb_token_expiry','mb_refresh_token','mb_pkce_verifier','mb_client_id'].forEach(k => localStorage.removeItem(k));
   accessToken = null;
+  userId = null;
+  allShows = [];
+  selectedShows = new Set();
+  playlistId = null;
   document.getElementById('landing').style.display = '';
   document.getElementById('app').classList.remove('visible');
 }
@@ -1283,6 +1292,48 @@ function buildDemo() {
     document.getElementById('build-btn').style.display = 'none';
     updateSelCount();
   }, 1800);
+}
+
+// ── Diagnostic ────────────────────────────────────────────────────────────
+async function runDiagnostic() {
+  const panel = document.getElementById('debug-panel');
+  const out = document.getElementById('debug-output');
+  panel.style.display = 'block';
+  out.textContent = 'Running…';
+
+  const lines = [];
+  try {
+    // 1. Check token exists
+    lines.push('Token: ' + (accessToken ? accessToken.substring(0,20) + '…' : 'MISSING'));
+
+    // 2. Check /me
+    const me = await spotifyFetch('https://api.spotify.com/v1/me');
+    const meData = await me.json();
+    lines.push('\n/me status: ' + me.status);
+    lines.push('User: ' + (meData.display_name || meData.id || 'unknown'));
+    lines.push('Product: ' + (meData.product || 'unknown'));
+    if (meData.error) lines.push('ERROR: ' + JSON.stringify(meData.error));
+
+    // 3. Raw /me/shows call with limit=1
+    const showsR = await spotifyFetch('https://api.spotify.com/v1/me/shows?limit=1');
+    const showsData = await showsR.json();
+    lines.push('\n/me/shows status: ' + showsR.status);
+    lines.push('Raw response: ' + JSON.stringify(showsData, null, 2).substring(0, 800));
+
+    // 4. Check scopes from token (decode JWT middle part)
+    try {
+      const parts = accessToken.split('.');
+      if (parts.length === 3) {
+        const payload = JSON.parse(atob(parts[1].replace(/-/g,'+').replace(/_/g,'/')));
+        lines.push('\nToken scopes: ' + (payload.scope || payload.scp || 'not in token payload'));
+      }
+    } catch(e) { lines.push('\n(Could not decode token scopes)'); }
+
+  } catch(e) {
+    lines.push('\nException: ' + e.message);
+  }
+
+  out.textContent = lines.join('\n');
 }
 </script>
 </body>
